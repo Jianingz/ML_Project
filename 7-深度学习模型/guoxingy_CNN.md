@@ -6,7 +6,7 @@
 - 卷积层
 - 池化层
 - 经典卷积神经网络列举
-- 应用
+- Tensorflow实现卷积神经网络
 
 
 卷积神经网络(Convolutuional Neural Network,简称CNN)，是深度学习技术中最具代表性的一种经典神经网络。卷积是一种特殊的线性运算，是值定义在两个联系实值函数的数学操作。而卷积神经网络就是指在网络结构中至少有一层使用了卷积运算来代替一般的矩阵乘法运算的神经网络。CNN应用非常广泛，尤其是在计算机视觉、图像识别等领域都有着出色的表现，获得了巨大成功。本节将对卷积神经网络做一个简介。
@@ -189,6 +189,124 @@ ResNet(Residual Neural Network)由微软研究院的Kaiming He等4位华人工�
 ResNet与普通的直连卷积神经网络最大的区别在于，ResNet有很多旁路的支线将输入直接连到后面的层，后面的层可以直接学习残差，这种结构是shortcut。在ResNet论文中，提出了如图的两层残差学习单元，还有三层的残差学习单元。两层的残差学习单元包括两个相同输出通道数的3*3卷积，而3层残差学习单元使用了1*1的卷积，并且在中间的3*3卷积前后都使用了1*1卷积，实现了先降维再升维的操作。
 
 ![](/resource/7.3.5_18.jpg?raw=true)
+
+### 7.3.6 Tensorflow实现卷积神经网络
+
+本节会应该Tensorflow实现一个简单的卷积神经网络，数据集是经典的MNIST。本节构建的神经网络会使用到两个卷积层和一个全连接层，读者可以通过这个例子掌握构建和设计CNN的重点环节。
+
+首先载入MNIST数据集，创建程序入口Interactive Session。
+```
+from tensorflow.examples.tutorials.mnist import input_data
+import tensorflow as tf
+mnist = input_data.read_data_sets("MNIST_data/", one_hot = true)
+sess = tf.InteractiveSession()
+```
+
+卷积神经网络中会有众多的权重和偏置需要创建，因此可以先定义好初始化函数，方便后续重复使用。此外我们还需给权重增加一些随机的噪声打破完全对称，比如可以使用截断的正太分布噪声，标准差设置为0.1。同时因为使用的激活函数式ReLU，也需要给偏置增加一些小的正值(0.1)来避免死亡节点(dead neurons)的出现。
+
+```
+def weight_variable(shape):
+	initial = tf.truncated_normal(shape, stddev = 0.1)
+	return tf.Variable(initial)
+
+def bias_varibale(shape):
+	initial = tf.constant(0.1, shape = shape)
+	return tf.Varibale(initial)
+```
+
+卷积层和池化层在后续也可以重复利用，所以不妨对其分布定义创建函数。Tensorflow中的tf.nn.conv2d是标准2维卷积函数，参数中x是输入，W是卷积的参数，比如[5,5,1,32]：前两个数字代表卷积核的尺寸，第三个数字代表有多少个channel。如果是才是RGB图片，这里设置为3，本例由于是灰度单色，所以这里是1。最后一个数字代表卷积核的数量，是指这个卷积层会提取多少类特征。Strides代表卷积核移动的步长，全是1的话代表不遗漏的扫描图片的所有点。Padding是指处理边界的方式，这里使用SAME代表给边界上Padding让卷积的输入和输出保存一样的尺寸。tf.nn.max_pool是Tensorflow中的最大池化函数，这么使用的是2*2的最大池化函数，会保留原始像素块中灰度值最高的一个像素点。因为要整体上缩小图片尺寸，因此池化层的步长也设置为横竖两个方向为2的步长。
+
+```
+def con2d(x,W):
+	return tf.nn.conv2d(x, W, strides = [1,1,1,1], padding = 'SAME')
+
+def max_pool_2*2(x):
+	return tf.nn.max_pool(x,ksize = [1,2,2,1], strides = [1,2,2,1], padding = 'SAME')
+```
+
+接下来定义输入的placeholder，x是特征，y_是label。由于卷积神经网络会用到图片的空间信息，所以需要把一维的向量转变为二维的向量，MNIST数据集每张图片是784个像素点，可以转换为28*28的结构，同时由于图片是灰度单色，只有一个颜色通道，所以可以确定尺寸为[-1,28,28,-1]，-1是代表样本数据不确定的占位符，最后一个1是颜色通道量。向量变形的函数可以使用tf.reshape。
+
+```
+x = tf.placeholder(tf.float32, [None, 784])
+y_ = tf.placeholder(tf.float32, [None, 10])
+x_image = tf.reshape(x, [-1,28,28,1])
+```
+
+下面就可以定义第一个卷积层了。首先使用前面定义好的函数对weighs和bias进行参数初始化，这里的[5,5,1,32]代表卷积核卷积核尺寸为5*5，1个颜色通道，32个不同的卷积核。然后使用conv2d函数进行卷积操作，随后加上偏置，再使用ReLU激活函数进行非线性处理。最后使用最大池化函数对输出结果做池化操作。
+
+```
+W_conv1 = weight_variable([5,5,1,32])
+b_conv1 = bias_variable([32])
+h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
+h_pool1 = max_pool_2*2(h_conv1)
+```
+
+第二层卷积层基本结构跟第一个卷积层一样，唯一的变化是卷积核的数量为64，在这层卷积层中会提前64种特征。
+
+```
+W_conv2 = weight_variable([5,5,32,64])
+b_conv2 = bias_variable([64])
+h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
+h_pool2 = max_pool_2*2(h_conv2)
+```
+
+在经历过两层卷积层的提取特征后，尤其是经历2次步长为2*2的最大池化层后，现在的图片边长缩减为原来的1/4，变为了7*7。而第二个卷积层的卷积核数为64，所以第二层的输出数据的尺寸为7*7*64。我们继续使用tf.reshape函数对输出向量做变化，转为一维向量，再连接一个隐含节点数为1024的全连接层，使用ReLU激活函数。
+
+```
+W_fc1 = weight_variable([7*7*64, 1024])
+b_fc1 = bias_variable([1024])
+h_pool2_flat = tf.reshape(h_pool2, [-1, 7*7*64])
+h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
+```
+
+为了减轻过拟合，下面使用一个Dropout层，通过一个placeholder传入keep_prob比率来控制。在训练时，我们随机丢掉一部分节点数据来减轻过拟合，但是在预测时会保留所有数据从而追求更高的准确率。
+
+```
+keep_prob = tf.placeholder(tf.float32)
+h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
+```
+最后将Dropout层连接一个Softmax函数，得到最后的概率。
+
+```
+W_fc2 = weight_variable([1024, 10])
+b_fc2 = bias_variable([10])
+y_conv = tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
+```
+
+我们定义损失函数cross entropy，使用的优化器是Adam，学习速率为1e-4。
+
+```
+cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y_conv), reduction_indices=[1]))
+train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
+```
+
+再定义评价准确率的操作。
+
+```
+correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_, 1))
+accuracy = tf.reduce_mean(tf.cast(correct_predication, tf.float32))
+
+```
+
+下面是训练过程。首先会初始化所有参数，设置Dropout的keep_prob=0.5。然后使用大小为50的mini-batch，进行20000次的迭代训练。参与训练的样本数量总共为100万，其中每训练100次进行一次的性能测评(测评时keep_prob=1)，用来实时监测模型的性能。
+
+```
+tf.global_variables_initializer().run()
+for i in range(20000):
+	batch = mnist.train.next_batch(50)
+	if i%100 == 0:
+		train_accuracy = accuracy.eval(feed_dict={x:batch[0], y_: batch[1], keep_prob:1.0})
+		print("step %d, training accuaracy %g" % (i, train_accuracy)
+	train_step.run(feed_dict={x:batch[0], y_:batch[1], keep_prob:0.5})
+```
+
+训练完成后，在最终的测试集上进行全面测试，得到准确率。
+
+```
+print("test accuracy %g" % accuracy.eval(feed_dict={x:mnist.test.images, y_:mnist.test.labels, keep_prob:1.0}))
+```
+
+以上就是利用Tensorflow实现一个简单的卷积神经网络，在MNIST数据集上准确率大概为99.3%，基本满足对手写数字识别的准确率要求。性能的提升主要来自更优秀的网络设计，卷积网络对特性特征的提取和抽象能力。
 
 
 
