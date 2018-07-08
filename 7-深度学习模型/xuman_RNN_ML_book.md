@@ -60,7 +60,7 @@ RNN原理
 随着神经网络的不断发展，传统神经网络增加了窗处理机制来处理时序数据，即将每个时刻视为一个窗口，通过将前后窗口向量并接成一个更大的向量，以此利用前后时刻的信息预测当前信息。
 
 ![RNN_5_from_zhihu](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_5.png)
-![RNN_5_from_zhihu](/Users/laiye/Desktop/ML/RNN/RNN_5.png)
+
 
 如图所示，要想预测$t_{1}$时刻的信息，传统的神经网络是通过将$t_{0}、t_{1}和t_{2}$时刻的向量并接起来，然后进行预测。
     
@@ -75,8 +75,8 @@ RNN原理
 
 如下图的左边为典型的RNN逻辑图，右边为RNN在时间序列上前向计算的展开图。
 
-![RNN_1](/Users/laiye/Desktop/ML/RNN/RNN_1.jpg)
-![RNN_1](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_1.png)
+
+![RNN_1](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_1.jpg)
 
 图1 RNN逻辑图
 
@@ -85,11 +85,11 @@ RNN原理
 
 RNN的数学本质与深度学习中传统网络的数学本质相同，都是通过权重矩阵与输入信息的线性变换加上激活函数的非线性变换，将输入空间映射到新的输出空间中去。
 
-![RNN_2_from_cs224d](/Users/laiye/Desktop/ML/RNN/RNN_2.png)
+
 ![RNN_2_from_cs224d](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_2.png)
 
-![RNN_6_from_zhihu](/Users/laiye/Desktop/ML/RNN/RNN_6.gif)
-![RNN_6_from_zhihu](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_6.png)
+
+![RNN_6_from_zhihu](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_6.gif)
 
 ### 1.2.2 常规神经网络的数学公式：
 
@@ -151,6 +151,7 @@ BPTT
 ## 1.4、常规RNN存在的问题—长期依赖（Long Term dependencies）的问题
 
 ![RNN_6_from_zhihu](/Users/laiye/Desktop/ML/RNN/RNN_6.gif)
+![RNN_6_from_zhihu](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_6.gif)
 
 $^{[2]}$忽略激活函数的非线性变换，只看上图蓝色箭头的传输。由公式（1）简化可以得出  $$ h_{t} = W_{(hh)} h_{t-1} \qquad (3)$$ 
 如果从隐藏层的初识状态$h_{0}$开始计算，可以得到：$$ h_{t} = W_{(hh)}^{t}h_{0} \qquad (4)$$
