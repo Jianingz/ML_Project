@@ -1,4 +1,4 @@
-# 深度学习技术入门与实战
+ 深度学习技术入门与实战
 
 标签（空格分隔）： MLP--任海霞部分
 
@@ -131,8 +131,71 @@ ReLU另外一个性质是提供神经网络的稀疏表达能力。PReLU[10]、E
 隐藏层有三个节点，隐藏层每个节点的输出取决于输入层的输出以及连接所附的权重。输出层有两个节点，从隐藏层接收输入，并执行类似高亮出的隐藏层的计算。输出值分别是预测的分类和聚类的结果。
 给出一系列特征 X = (x1, x2, ...) 和目标 Y，一个多层感知器可以以分类或者回归为目的，学习到特征和目标之间的关系。
 ##如何训练（反向传播）
-
+神经网络是一个模型，我们需要让模型自己学习它的参数也就是神经网络中的权重。当然一个神经网络的连接方式、网络的层数、每层的节点数这些参数，则不是学习出来的，而是人为事先设置的。对于这些人为设置的参数，我们称之为超参数(Hyper-Parameters)。
+接下来，我们将要介绍神经网络的训练算法：反向传播算法。
+其主要思想是：
+（1）将训练集数据输入到神经网络输入层，经过隐藏层，最后达到输出层并输出结果，这是ANN的前向传播过程；
+（2）由于神经网络的输出结果与实际结果有误差，则计算估计值与实际值之间的误差，并将该误差从输出层向隐藏层反向传播，直至传播到输入层；
+（3）在反向传播的过程中，根据误差调整各种参数的值；不断迭代上述过程，直至收敛。
+它的数学推导方法是：
+1.变量定义
+![](https://img-blog.csdn.net/20160401202509000)
+ 上图是一个三层人工神经网络，layer1至layer3分别是输入层、隐藏层和输出层。如图，先定义一些变量：
+![](https://img-blog.csdn.net/20160401202738142)表示第L-1层的第k个神经元连接到第L层的第j个神经元的权重
+![](https://img-blog.csdn.net/20160401202925814)表示第L层的第j个神经元的偏置
+![](https://img-blog.csdn.net/20160401202949221)表示第L层的第j个神经元的输入，也即：
+![](https://img-blog.csdn.net/20160401203046815)
+![](https://img-blog.csdn.net/20160401203055737)表示第L层的第j个神经元的输出，也即
+![](https://img-blog.csdn.net/20160401203135690)
+其中![](https://img-blog.csdn.net/20160401203156534)表示激活函数
+2.代价函数
+以训练集![](https://www.zhihu.com/equation?tex=%5Cleft%5C%7B+%28x%5E%7B%281%29%7D%2Cy%5E%7B%281%29%7D%29%2C+%28x%5E%7B%282%29%7D%2Cy%5E%7B%282%29%7D%29%2C+...+%2C+%28x%5E%7B%28m%29%7D%2Cy%5E%7B%28m%29%7D%29+%5Cright%5C%7D)
+为例，其中有 m 个训练样本，每个包含一组输入 x^{(i)} 和一组输出 y^{(i)} 。一般来说，我们使用的神经网络的代价函数是逻辑回归里代价函数的一般形式。
+在逻辑回归中，我们的代价函数通常为： ![](https://www.zhihu.com/equation?tex=J%28%5CTheta%29%3D-%5Cfrac%7B1%7D%7Bm%7D%5B%5Csum_%7Bi%3D1%7D%5E%7Bm%7D%5Csum_%7Bk%3D1%7D%5E%7BK%7D%7By_%7Bk%7D%5E%7B%28i%29%7Dlog%28h_%7B%5CTheta%7D%28x%5E%7B%28i%29%7D%29%29_%7Bk%7D%2B%281-y_%7Bk%7D%5E%7B%28i%29%7D%29log%281-%28h_%7B%5CTheta%7D%28x%5E%7B%28i%29%7D%29%29_%7Bk%7D%29%7D%5D%2B%5Cfrac%7B%5Clambda%7D%7B2m%7D%5Csum_%7Bl%3D1%7D%5E%7BL-1%7D%5Csum_%7Bi%3D1%7D%5E%7Bs_%7Bl%7D%7D%5Csum_%7Bj%3D1%7D%5E%7Bs_%7Bl%2B1%7D%7D%28%5CTheta_%7Bji%7D%5E%7B%28l%29%7D%29%5E%7B2%7D)其中![](https://www.zhihu.com/equation?tex=h_%7B%5CTheta%7D%28x%29%5Cin+R%5E%7BK%7D)（K 维向量），![](https://www.zhihu.com/equation?tex=%28h_%7B%5CTheta%7D%28x%29%29_%7Bi%7D)表示第 i 个输出。
+即每一个的逻辑回归算法的代价函数，按输出的顺序 1 ～ K，依次相加。
+3.公式及推导
+这里我们先定义第l层的第j个神经元产生的误差为：![](https://img-blog.csdn.net/20160401203433129)当输入的样本数量为1时，代价函数为：![](https://img-blog.csdn.net/20160401203458879)
+首先我们来计算最后一层神经网络产生的错误为：![](https://img-blog.csdn.net/20160401203552879)
+其中![](https://img-blog.csdn.net/20160401203529707)表示Hadamard乘积，用于矩阵或向量之间点对点的乘法运算。
+由此出发，我们可以计算每层神经网络的误差：![](https://img-blog.csdn.net/20161230105754424)
+其中权重的梯度是：![](https://img-blog.csdn.net/20160401203634161)
+偏置的梯度是：![](https://img-blog.csdn.net/20160401203656833)
+综上所诉：反向传播的实现过程如下：
+对于训练集中的每个样本x，设置输入层（Input layer）对应的激活值：
+前向传播：![](https://img-blog.csdn.net/20160401203739849)
+计算输出层产生的错误：![](https://img-blog.csdn.net/20160401203820380)
+反向传播错误：![](https://img-blog.csdn.net/20160401203833583)
+使用梯度下降（gradient descent），训练参数：![](https://img-blog.csdn.net/20160401203848037)
 ##损失函数
+损失函数（loss function）是用来估量你模型的预测值f(x)与真实值Y的不一致程度，它是一个非负实值函数,通常使用L(Y, f(x))来表示，损失函数越小，模型的鲁棒性就越好。损失函数是经验风险函数的核心部分，也是结构风险函数重要组成部分。模型的结构风险函数包括了经验风险项和正则项，通常可以表示成如下表达式：
+![](https://img-blog.csdn.net/20180712203110396?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zODM2ODk0MQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+其中，前面的均值函数表示的是经验风险函数，L代表的是损失函数，后面的Φ是正则化项（regularizer）或者叫惩罚项（penalty term），它可以是L1，也可以是L2，或者其他的正则函数。整个式子表示的意思是找到使目标函数最小时的θ值。下面主要列出几种常见的损失函数。
+一、log对数损失函数（逻辑回归）
+有些人可能觉得逻辑回归的损失函数就是平方损失，其实并不是。平方损失函数可以通过线性回归在假设样本是高斯分布的条件下推导得到，而逻辑回归得到的并不是平方损失。在逻辑回归的推导中，它假设样本服从伯努利分布（0-1分布），然后求得满足该分布的似然函数，接着取对数求极值等等。而逻辑回归并没有求似然函数的极值，而是把极大化当做是一种思想，进而推导出它的经验风险函数为：最小化负的似然函数（即max F(y, f(x)) —> min -F(y, f(x)))。从损失函数的视角来看，它就成了log损失函数了。
 
+log损失函数的标准形式：
+![](https://img-blog.csdn.net/20180713140524863?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zODM2ODk0MQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70) 刚刚说到，取对数是为了方便计算极大似然估计，因为在MLE中，直接求导比较困难，所以通常都是先取对数再求导找极值点。损失函数L(Y, P(Y|X))表达的是样本X在分类Y的情况下，使概率P(Y|X)达到最大值（换言之，就是利用已知的样本分布，找到最有可能（即最大概率）导致这种分布的参数值；或者说什么样的参数才能使我们观测到目前这组数据的概率最大）。因为log函数是单调递增的，所以logP(Y|X)也会达到最大值，因此在前面加上负号之后，最大化P(Y|X)就等价于最小化L了。
+
+逻辑回归的P(Y=y|x)表达式如下（为了将类别标签y统一为1和0，下面将表达式分开表示）：![](https://zhihu.com/equation?tex=P%28Y%3Dy%7Cx%29+%3D+%5Cleft%5C%7B%5Cbegin%7Bmatrix%7D%0Ah_%5Ctheta%28x%29+%3D+g%28f%28x%29%29+%3D+%5Cfrac%7B1%7D%7B1+%2B+exp%5C%7B-f%28x%29%5C%7D+%7D%26+%2Cy%3D1%5C%5C+%0A1+-+h_%5Ctheta%28x%29+%3D+1+-+g%28f%28x%29%29+%3D+%5Cfrac%7B1%7D%7B1+%2B+exp%5C%7Bf%28x%29%5C%7D+%7D+%26+%2Cy%3D0%0A%5Cend%7Bmatrix%7D%5Cright.)
+将它带入到上式，通过推导可以得到logistic的损失函数表达式，如下：
+![](https://zhihu.com/equation?tex=L%28y%2CP%28Y%3Dy%7Cx%29%29+%3D+%5Cleft%5C%7B%5Cbegin%7Bmatrix%7D%0A+%5Clog+%281%2Bexp%5C%7B-f%28x%29%5C%7D%29+%26+%2Cy%3D1%5C%5C+%0A+%5Clog+%281%2Bexp%5C%7B+f%28x%29%5C%7D%29++%26+%2Cy%3D0%5C%5C+%0A%5Cend%7Bmatrix%7D%5Cright.)
+逻辑回归最后得到的目标式子如下：
+![](https://img-blog.csdn.net/20180713140554331?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zODM2ODk0MQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)上面是针对二分类而言的。这里需要解释一下：之所以有人认为逻辑回归是平方损失，是因为在使用梯度下降来求最优解的时候，它的迭代式子与平方损失求导后的式子非常相似，从而给人一种直观上的错觉。
+
+这里有个PDF可以参考一下：Lecture 6: logistic regression.pdf.
+二、平方损失函数（最小二乘法, Ordinary Least Squares ）
+最小二乘法是线性回归的一种，OLS将问题转化成了一个凸优化问题。在线性回归中，它假设样本和噪声都服从高斯分布（为什么假设成高斯分布呢？其实这里隐藏了一个小知识点，就是中心极限定理，可以参考【central limit theorem】），最后通过极大似然估计（MLE）可以推导出最小二乘式子。最小二乘的基本原则是：最优拟合直线应该是使各点到回归直线的距离和最小的直线，即平方和最小。换言之，OLS是基于距离的，而这个距离就是我们用的最多的欧几里得距离。为什么它会选择使用欧式距离作为误差度量呢（即Mean squared error， MSE），主要有以下几个原因：
+简单，计算方便；
+欧氏距离是一种很好的相似性度量标准；
+在不同的表示域变换后特征性质不变。
+平方损失（Square loss）的标准形式如下：
+![](https://img-blog.csdn.net/20180713141310776?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zODM2ODk0MQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+当样本个数为n时，此时的损失函数变为：
+![](http://latex.codecogs.com/gif.latex?L%28Y%2C%20f%28X%29%29%20%3D%20%5Csum%20_%7Bi%3D1%7D%5E%7Bn%7D%28Y%20-%20f%28X%29%29%5E2)
+Y-f(X)表示的是残差，整个式子表示的是残差的平方和，而我们的目的就是最小化这个目标函数值（注：该式子未加入正则项），也就是最小化残差的平方和（residual sum of squares，RSS）。
+
+而在实际应用中，通常会使用均方差（MSE）作为一项衡量指标，公式如下：
+![](https://img-blog.csdn.net/20180713140713998?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zODM2ODk0MQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 ##python代码实例（API调用和手写代码实现）
+
 
