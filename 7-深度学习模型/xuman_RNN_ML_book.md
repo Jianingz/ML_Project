@@ -842,8 +842,525 @@ for i in range(num):
 ![RNN_18](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_18.png)
 ![RNN_18](/Users/laiye/Desktop/ML/RNN/RNN_18.png)
 
-## 3.3 
+# 3.3  LSTM实现简单的问答系统
+## 3.3.1 问答系统简介
 
+##3.3.2 基于keras实现简单的问答系统
+
+模型逻辑图如下：  
+![RNN_20](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_20.png)
+![RNN_20](/Users/laiye/Desktop/ML/RNN/RNN_20.png)
+
+数据集：Facebook的bAbI数据  
+训练集：  
+
+```python 
+1 Mary moved to the bathroom.
+2 Sandra journeyed to the bedroom.
+3 Mary got the football there.
+4 John went to the kitchen.
+5 Mary went back to the kitchen.
+6 Mary went back to the garden.
+7 Where is the football? 	garden	3 6
+8 Sandra went back to the office.
+9 John moved to the office.
+10 Sandra journeyed to the hallway.
+11 Daniel went back to the kitchen.
+12 Mary dropped the football.
+13 John got the milk there.
+14 Where is the football? 	garden	12 6
+15 Mary took the football there.
+16 Sandra picked up the apple there.
+17 Mary travelled to the hallway.
+18 John journeyed to the kitchen.
+19 Where is the football? 	hallway	15 17
+训练集是对话 + 问题 + 答案的形式，每个问句中以tab键分割问题、答案以及含有答案的句子索引。
+```
+接下来利用两个循环神经网络实现简单的问答系统。  
+（1）获取预处理  
+数据在amazoneaws的网站上，如果在运行代码出现下载不成功，就要先把数据集下载下来，然后放到keras的数据集目录下。代码中有具体操作。
+
+```python 
+# 获取数据
+from keras.utils.data_utils import get_file
+import tarfile
+try:
+    path = get_file('babi-tasks-v1-2.tar.gz', \
+                    origin='https://s3.amazonaws.com/text-datasets/babi_tasks_1-20_v1-2.tar.gz')
+except:
+    print('Error downloading dataset, please download it manually:\n'
+          '$ wget http://www.thespermwhale.com/jaseweston/babi/tasks_1-20_v1-2.tar.gz\n'
+          '$ mv tasks_1-20_v1-2.tar.gz ~/.keras/datasets/babi-tasks-v1-2.tar.gz')
+    raise
+```
+（2）数据预处理   
+**对文本数据进行向量化，word2vector**  
+
+1. 对文本数据 Tokenize，因为本数据集为英文，分词可直接用空格，如果数据集为中文，需要利用结巴或者其他分词器进行分词。
+
+```python 
+#将每个单词分割来
+def tokenize(data):
+    import re
+    # ‘\W’ 匹配所有的字母数字下划线以外的字符
+    return [x.strip() for x in re.split(r"(\W+)?", data) if x.strip()]
+```
+
+2.  解析对话文本
+
+```python 
+# parse_dialog 将所有的对话进行解析，返回tokenize后的(对话,问题,答案)
+# 如果 only_supporting为真表明只返回含有答案的对话
+def parse_dialog(lines, only_supporting = False):
+    data = []
+    dialog = []
+    for line in lines:
+        line = line.strip()
+        nid, line = line.split(' ',1)
+        nid = int(nid)
+        # 标号为1表示新的一段文本的开始，重新记录
+        if nid == 1:
+            dialog = []
+        #含有tab键的说明就是问题，将问题，答案和答案的索引分割开
+        if '\t' in line:
+            ques, ans, data_idx = line.split('\t')
+            ques = tokenize(ques)
+            substory = None
+            if only_supporting :
+                data_idx = list(map(int,data_idx))
+                substory = [dialog[ i-1 ] for i in data_idx.split()]
+            else:
+                substory = [x for x in dialog]
+            data.append((substory ,ques, ans))
+        else:
+            # 不含有tab键的就是对话，tokenize后加入dialog的list
+            line = tokenize(line)
+            dialog.append(line)
+    return data
+```
+
+ 3. 获得每个对话文本，将tokenize后的每个对话文本放在一个列表中。将（对话，问题，答案）组成相对应的tuple存储。
+
+ ```python 
+ #这里的maxlen是控制文本最大长度的，可以利用分位数找出覆盖90%数据的长度，令其为maxlen。
+ # 否则序列长度太长，训练时内存不够。
+def get_dialog(f, only_supporting = False, max_length = None):
+    #将对话完整的提取出来
+    data = parse_dialog(f.readlines(),only_supporting = only_supporting)
+    flatten = lambda data: reduce(lambda x, y: x + y, data)
+    data = [(flatten(dialog), ques, ans) for (dialog, ques, ans) in data 
+                if not max_length or len(flatten(dialog))<max_length]
+    return data
+ ```
+ 
+ 4. 数据长度归一化。找出对话文本的最大单词长度，对所有的对话进行padding，将长度归一化。问题集同此。
+
+ ```python
+ def vectorize_dialog(data,wd_idx, dialog_maxlen, ques_maxlen):
+    #向量化,返回对应词表的索引号
+    import numpy as np
+    from keras.preprocessing.sequence import pad_sequences
+    dialog_vec = []
+    ques_vec = []
+    ans_vec = []
+    for dialog, ques, ans in data:
+        dialog_idx = [wd_idx[w] for w in dialog]
+        ques_idx = [wd_idx[w] for w in ques]
+        
+        ans_zero = np.zeros(len(wd_idx) + 1)
+        ans_zero[wd_idx[ans] ] = 1
+        
+        dialog_vec.append(dialog_idx)
+        ques_vec.append(ques_idx)
+        ans_vec.append(ans_zero)
+        
+        #序列长度归一化，分别找出对话，问题和答案的最长长度，然后相对应的对数据进行padding。
+    return pad_sequences(dialog_vec, maxlen = dialog_maxlen),\
+            pad_sequences(ques_vec, maxlen = ques_maxlen),\
+            np.array(ans_vec)
+ ```
+
+5. 准备数据，并利用上述函数进行预处理。
+
+```python
+#准备数据
+train_tar = tar.extractfile(data_path.format('train'))
+test_tar = tar.extractfile(data_path.format('test'))
+train = get_dialog(train_tar)
+test = get_dialog(test_tar)
+
+# 建立词表。词表就是文本中所有出现过的单词组成的词表。
+lexicon = set()
+for dialog, ques, ans in train + test:
+    lexicon |= set(dialog + ques + [ans])
+lexicon = sorted(lexicon)
+lexicon_size = len(lexicon)+1
+
+#word2vec，并求出对话集和问题集的最大长度，padding时用。
+wd_idx = dict((wd, idx+1) for idx, wd in enumerate(lexicon))
+dialog_maxlen = max(map(len,(x for x, _, _ in train + test )))
+ques_maxlen =  max(map(len,(x for _, x, _ in train + test )))
+#计算分位数，在get_dialog函数中传参给max_len
+dia_80 = np.percentile(map(len,(x for x, _, _ in train + test )),80)
+
+# 对训练集和测试集，进行word2vec
+dialog_train, ques_train, ans_train = vectorize_dialog(train, wd_idx, dialog_maxlen, ques_maxlen)
+dialog_test, ques_test, ans_test = vectorize_dialog(test, wd_idx, dialog_maxlen, ques_maxlen)
+
+```
+
+6. 搭建神经网络模型   
+
+因为对话集和问题集之间存在内在联系，所以先分别进行embedding和dropout，在merge到一起后，传入LSTM网络中，最后LSTN网络的输出进入一个softmax函数，完成模型的搭建。
+
+* 对话集的网络搭建。
+
+![RNN_22](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_22.png)
+![RNN_22](/Users/laiye/Desktop/ML/RNN/RNN_22.png)  
+
+注：dialog\_maxlen = 149，embedding\_out = 50.   
+输入：（dialog\_maxlen，）  即（None，149).     
+输出：也就是embedding层的输出，shape为（dialog\_maxlen ，embedding\_out).   
+
+因为对数据进行了长度的归一化处理，所以每个dialog的长度都为dialog\_maxlen ，所以此时输出数据的shape为
+（149，50）。  每个列向量就是每个dialog进行embedding后的向量。
+
+```python 
+#对话集 构建网络—— embedding + dropout
+dialog = Input(shape = (dialog_maxlen, ),dtype='int32')
+encodeed_dialog = embeddings.Embedding(lexicon_size, embedding_out)(dialog)
+encodeed_dialog = Dropout(0.3)(encodeed_dialog)
+```
+
+* 问题集网络搭建  
+
+问题集进入LSTM网络，keras的LSTM默认是只输出hidden_layer的最后一维， 所以LSTM的输出只有一列向量。
+
+LSTM的输出进行RepeatVector，也就是重复dialog_maxlen次，这样encodeed_ques的shape就变为了（dialog_maxlen，lstm_out）。与encodeed_dialog的shape相同，这样才能进行merge层的add。
+![RNN_21](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_21.png)
+![RNN_21](/Users/laiye/Desktop/ML/RNN/RNN_21.png)
+
+```python 
+#问题集 embedding + dropout + lstm
+question = Input(shape = (ques_maxlen,),dtype= 'int32')
+encodeed_ques = embeddings.Embedding(lexicon_size, embedding_out)(question)
+encodeed_ques = Dropout(0.3)(encodeed_ques)
+encodeed_ques = LSTM(units = lstm_out)(encodeed_ques)
+encodeed_ques = RepeatVector(dialog_maxlen)(encodeed_ques)
+```
+
+* 对话集和问题集之间是存在内在联系的，将二者通过merge层之后再进行循环神经网络的训练。
+
+![RNN_23](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_23.png)
+![RNN_23](/Users/laiye/Desktop/ML/RNN/RNN_23.png)
+
+```python
+# merge 对话集和问题集的模型 merge后进行 lstm + dropout + dense
+merged = Add()([encodeed_dialog, encodeed_ques])
+merged = LSTM(units = lstm_out)(merged)
+merged = Dropout(0.3)(merged)
+preds = Dense(units = lexicon_size, activation = 'softmax')(merged)
+
+model = Model([dialog, question], preds)
+```
+
+* 编译
+
+```python
+print('compiling........')
+model.compile(optimizer='adam',
+              loss = 'categorical_crossentropy',
+              metrics = ['accuracy']
+               )
+```
+
+* 训练
+
+```python 
+#训练
+print('training.......')
+model.fit([dialog_train, ques_train], ans_train,
+         batch_size = batch_size,
+         epochs = epochs,
+         verbose = 1,
+          validation_split = 0.1
+         )
+loss , accu = model.evaluate([dialog_test, ques_test], ans_test, 
+                             verbose= 1,
+                             batch_size = batch_size)
+print('%s: %.4f \n %s: %.4f' % ('loss', loss, 'accu', accu))
+
+```
+
+* 预测
+
+```python 
+pre = model.predict([dialog_test, ques_test],
+              batch_size = batch_size,
+              verbose = 1)
+#输出测试过程
+def get_key(dic,value):
+    return [k for k,v in wd_idx.items() if v == value]
+import numpy as np
+a = pre[0].tolist()
+a.index(max(a))
+for i in range(len(dialog_test)):
+    ques = []
+    lis_dia = list(map(lambda x : get_key(wd_idx,x), dialog_test[i]))
+    dialog = reduce(lambda x,y :x+' '+y ,(reduce(lambda x, y: x+y,lis_dia)))
+    
+    lis_ques = (map(lambda x : get_key(wd_idx,x), ques_test[i]))
+    ques = reduce(lambda x,y :x+' '+y,(reduce(lambda x, y: x+y,lis_ques)))
+    
+    ans_idx = np.argmax(ans_test[i])
+    pre_idx = np.argmax(pre[i])
+    print('%s\n %s ' % ('dialog',dialog))
+    print('%s\n %s ' % ('question',ques))
+    print('%s\n %s ' % ('right_answer',get_key( wd_idx, ans_idx)))  
+    print('%s\n %s\n' % ('pred',get_key(wd_idx, pre_idx)))
+```
+
+预测输出示例：
+
+![RNN_19](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_19.png)
+![RNN_19](/Users/laiye/Desktop/ML/RNN/RNN_19.png)
+
+总的来说就是，对话集数据进行embedding后的输出（矩阵），与问题集进行LSTM及RepeatVector后的输出（矩阵），两个矩阵（shape相同）相对应的拼接成一个大的矩阵，称为mat\_merge；mat\_merge进入LSTM训练，输出最后一个hidden\_state的输出，称为h\_out（一个列向量）。然后h\_out进入全连接层，此时h_out与词表中的每个词计算softmax的概率值，概率最大的即为预测的答案。
+
+
+## lstm 文本生成
+
+**RNN的类别：**
+
+循环神经网络主要应用于序列数据的处理，因输入与输出数据之间有时间上的关联性，所以在常规神经网络的基础上，加上了时间维度上的关联性，也就是有了循环神经网络。因此对于循环神经网络而言，它能够记录很长时间的历史信息，即使在某一时刻有相同的输入，但由于历史信息不同，也会得到不同的输出，这也是循环神经网络相比于常规网络的不同之处。
+根据输入与输出之间的对应关系，可以将循环神经网络分为以下五大类别：
+
+
+![RNN_15](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_25.png)
+![RNN_19](/Users/laiye/Desktop/ML/RNN/RNN_25.png)
+
+
+常规网络中的输入与输出大多是向量与向量之间的关联，不考虑时间上的联系，而在循环神经网络中，输入与输出之间大多是序列与序列(Sequence-to-Sequence.)之间的联系，也就产生了多种模式。
+
+*  一对一（one to one）：最为简单的反向传播网络
+*  一对多（one to many）：可用于图像捕捉（image captioning），将图像转换为文字
+*  多对一（many to one）：常用于情感分析（sentiment analysis），将一句话中归为具体的情感类别。
+* 多对多（ many to many）：常用于输入输出序列长度不确定时，例如机器翻译（machine translate），实质是两个神经网络的叠加。
+*   不确定长度的多对多（many to many）（最右方）：常用于语音识别（speech recognition）中，输入与输出序列等长。
+
+**文本生成原理：**
+
+本章节的文本生成（text  generation）示例基于char RNN，也就是说循环神经网络的输入为一个字一个字的序列，输出为与输入等长的字序列，属于上述中的等长的多对多的结构。
+
+基于字符集的文本生成原理可以这样简单理解：  
+（1）将一个长文本序列依次输入到循环神经网络  
+（2）对于给定前缀序列的序列数据，对序列中将要出现的下一个字符的概率分布建立模型  
+（3）这样就可以每次产生一个新的字符
+如下图所示，我们想要从给定序列‘hell’中生成‘hello’。每次输入到循环神经网络中一个字符，并计算其概率分布。所以每个字符的出现概率分布都是基于前面历史序列得到的，如第二个‘l’的概率是通过历史信息‘hel’得出。在输出层可以通过最大似然或者条件随机场等规则选择结果。
+再经过不断的迭代和优化训练出文本生成的模型。
+
+![RNN_16](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_26.png)
+![RNN_19](/Users/laiye/Desktop/ML/RNN/RNN_26.png)
+
+**古诗生成：**
+
+在本示例中，将会通过3000多首的唐诗，利用LSTM网络训练一个古诗生成的模型。
+
+**代码解读：**
+
+网络逻辑图如下：
+
+![RNN_19](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_19.png)
+![RNN_19](/Users/laiye/Desktop/ML/RNN/RNN_24.png)
+
+1、数据处理
+自然语言处理中，数据预处理的很多过程是共通的，都是要将文本数据进行编码，变为机器可以识别的词向量或者字向量，比如Word2Vec，one-hot编码等方法。
+本次数据预处理步骤如下：
+（1）读取古诗数据集，在每首诗的末尾加‘]’，并去除古诗名字只取古诗内容，最后得到一个长文本
+
+```python
+with open('poetry.txt', 'r') as f:
+    files_content = ''
+    lines = [x  for x in f]
+    for line in lines[:10]:
+        files_content += (line.strip() + "]").split(":")[-1]
+```
+（2）统计每个字出现的频率，并去除出现频率较低的字。一般来说如果数据集较小可以不去除。
+
+```python
+ # 统计每个字符出现的概率
+    words = sorted(list(files_content))
+    counted_words = {}
+    for word in words:
+        if word in counted_words:
+            counted_words[word] += 1
+        else:
+            counted_words[word] = 1
+    # 去除出现概率较小的字符。此处设置为2
+    word_delet = []
+    for key in counted_words:
+        if counted_words[key] <= 2:
+            word_delet.append(key)
+    for key in word_delet:
+        del counted_words[key]
+```
+(3) 按照出现频率排序，保留字符集词典，并在最后添加空格字符。
+
+```python
+wordPairs = sorted(counted_words.items(), key=lambda x: -x[1])
+    words, _ = zip(*wordPairs)
+    print(words)
+    words += (" ",)
+```
+（4） 按照（3）中得到的词典，得到每个字对应的索引号，建立{字符：索引号}以及{索引号：字符}两个字典。因为机器无法识别汉字，只能转换为数字输入，这也是自然语处理中的常规操作。此处还定义了由字符转换为索引号的函数，以便之后使用。
+
+```python
+    word2num = dict((c, i) for i, c in enumerate(words))
+    num2word = dict((i, c) for i, c in enumerate(words))
+    word2numF = lambda x: word2num.get(x, len(words) - 1)
+    return word2numF, num2word, words, files_content
+```
+
+2、定义配置数据
+
+这里所谓的配置数据指的是每次处理的样本数据量batch_size，模型训练的学习率learning_rate，每次取字符的最大长度maxlen，模型参数存储的文件路径，此处参数主要是权重，model_path。
+
+```python
+    model_path = 'poetry_model.h5'
+    max_len = 6
+    batch_size = 512
+    learning_rate = 0.001
+```
+
+3、生成训练数据。
+（1）训练数据分为输入数据和输出数据，因为此处生成的是七言古诗，所以可得知输入6个字，预测输出一个字。
+
+```python
+#  max_len=6
+x = self.files_content[i: i + self.config.max_len]
+y = self.files_content[i + self.config.max_len]
+```
+（2）将输入输出数据转为向量。
+
+```python
+y_vec = np.zeros(
+                shape=(1, len(self.words)),
+                dtype=np.bool
+            )
+x_vec = np.zeros(
+    shape=(1, self.config.max_len),
+    dtype=np.int32
+)
+y_vec[0, self.word2numF(y)] = 1.0
+for t, char in enumerate(x):
+    x_vec[0, t] = self.word2numF(char)
+    
+yield x_vec, y_vec
+```
+（3）此处用到一个while 1 的循环加生成器，每个batch生成一次输入输出向量，送入模型训练。
+
+```python
+ i = 0
+ while 1:
+ ··· ···（上述代码）
+ i += 1
+```
+
+4、建立模型
+
+模型很简单，就是两个lstm的叠加加上一个全连接层。因为keras已经将模型封装的很好了，使用起来很简单。
+
+```python
+input_tensor = Input(shape=(self.config.max_len,))
+embedd = Embedding(len(self.num2word), 300, input_length=self.config.max_len)(input_tensor)
+lstm = (LSTM(512, return_sequences=True))(embedd)
+dropout = Dropout(0.6)(lstm)
+lstm = LSTM(256)(dropout)
+dropout = Dropout(0.6)(lstm)
+dense = Dense(len(self.words), activation='softmax')(dropout)
+self.model = Model(inputs=input_tensor, outputs=dense)
+
+optimizer = Adam(lr=self.config.learning_rate)
+self.model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+```
+
+5、训练模型
+
+计算epoch，防止输入输出的下标超出文本长度。
+
+```python
+number_of_epoch = len(self.files_content) // self.config.batch_size
+                      
+if not self.model:
+    self.build_model()
+self.model.summary()
+self.model.fit_generator(
+    generator=self.data_generator(),
+    verbose= 1,
+    steps_per_epoch=self.config.batch_size,
+    epochs=number_of_epoch)
+```
+
+6、输入文本，输出预测的古诗。
+
+（1）概率抽样。不是完全选择概率最大的输出，而是根据生成的概率抽样选择最后的预测输出数据。temperature参数可以调节抽样的权重，当temperature较小时，选择概率较大的值输出，反之选择概率较小的。
+
+```python
+    def sample(self, preds, temperature=1.0):
+        '''
+        当temperature=1.0时，模型输出正常
+        当temperature小于1时时，模型输出比较open
+        当temperature大于1时，模型输出比较保守
+        在训练的过程中可以看到temperature不同，结果也不同
+        '''
+        preds = np.asarray(preds).astype('float64')
+        preds = np.log(preds) / temperature
+        exp_preds = np.exp(preds)
+        preds = exp_preds / np.sum(exp_preds)
+        probas = np.random.multinomial(1, preds, 1)
+        return np.argmax(probas)
+
+```
+（2）预测输出
+
+输入的文本长度如果小于4个字，则自动补全。
+
+```python
+with open(self.config.poetry_file, 'r', encoding='utf-8') as f:
+            file_list = f.readlines()
+random_line = random.choice(file_list)
+# 如果给的text不到四个字，则随机补全
+if not text or len(text) != 4:
+    for _ in range(4 - len(text)):
+        random_str_index = random.randrange(0, len(self.words))
+        text += self.num2word.get(random_str_index) \
+                if self.num2word.get(random_str_index) not in [',', '。','，'] \
+                else self.num2word.get(random_str_index + 1)
+seed = random_line[-(self.config.max_len):-1]
+
+```
+利用sample函数产生概率抽样值，然后选择模型的输出概率，将向量转换为汉字输出。
+
+```python
+# text 为输入文本
+for c in text:
+	# seed 为自定补全的输入文本，长度不小于4个字。
+    seed = seed[1:] + c
+    for j in range(5):
+        x_pred = np.zeros((1, self.config.max_len))
+        for t, char in enumerate(seed):
+            x_pred[0, t] = self.word2numF(char)
+
+        preds = self.model.predict(x_pred, verbose=0)[0]
+        next_index = self.sample(preds, 1.0)
+        next_char = self.num2word[next_index]
+        seed = seed[1:] + next_char
+    res += seed
+```
+![RNN_27](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_27.png)
+![RNN_27](/Users/laiye/Desktop/ML/RNN/RNN_27.png)
+
+训练次数太少，模型还不能很好的生成古诗，可以看到随着训练次数的增加，模型会越加越智能。
 
 
 
