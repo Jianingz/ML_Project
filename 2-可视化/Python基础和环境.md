@@ -1026,4 +1026,8 @@ df.T
 
 
 
-## 1.2 Anaconda环境
+## 1.2 Python环境
+
+Python的强大之处就在于它宽广的应用领域范围，它能够遍及人工智能、科学计算、Web开发、系统运维、大数据及云计算、金融、游戏开发等多个领域。Python具有d的数量庞大的标准库和第三方库是实现其强大功能的保障。通过对库的引用，我们可以实现对不同领域业务的开发。然而，正是由于数量庞大的库，如何管理这些库以及如何及时更新维护这些库就成为既重要又复杂的工作。在这种背景下，一批库管理工具软件应运而生，Anaconda就是其中非常优秀的代表之一。它就是可以便捷获取包且对包能够进行管理。Anaconda包含了conda、Python在内的超过180个科学包及其依赖项，它包含的科学库包括：conda, numpy, scipy, ipython notebook等等。它的官方网站是：https://www.anaconda.com ，与Python相对应，Anaconda的版本分为Anaconda2和Anaconda3，读者可以自行下载日常常用的版本，提供32位和64位下载。
+
+接下来在哪里编写Python程序代码就成了新的问题。这里我们推荐使用Jupyter Notebook（IPython notebook）。Jupyter Notebook是基于网页的用于交互计算的应用程序。它可被应用于全过程计算：开发、文档编写、运行代码和展示结果。目前Jupyter Notebook已经成为Python教学、计算、科研的一个重要工具。它的优点是可以在网页页面中直接编写代码和运行代码，代码的运行结果也会直接在代码块下显示的程序。如在编程过程中需要编写说明文档，可在同一个页面中直接编写，便于作及时的说明和解释。Jupyter Notebook的输入和输出都是以文档的形式体现的，文档保存的后缀名为.ipynb。读者可以通过使用Anaconda启动Jupyter Notebook来实现Python程序代码的编写。
