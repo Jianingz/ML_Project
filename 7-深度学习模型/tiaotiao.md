@@ -210,13 +210,13 @@ III、相比于 sigmoid/tanh，ReLU只需要一个阈值就可以得到激活值
 
 0-1损失函数表达式如下图，由表达式可以看出，0-1损失函数是直接将模型输出值与准确答案做对比，这样的损失函数适用于验证当前模型的输出是否正确，但是不适合用来优化参数。
 
-![image](https://ask.qcloudimg.com/http-save/yehe-1008345/l9lvv3fc4r.jpeg?imageView2/2/w/1620)
+![image.png](https://upload-images.jianshu.io/upload_images/13064452-3f07e9db5189cd5c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 二、合页（Hinge）损失函数
 
 Hinge损失函数的表达式如下图，从表达式可以看出，当数据点被正确分类，损失为0，如果没有被正确分类，损失为z。Hinge可以解间距最大化的问题，通常与SVM结合使用。
 
-![image](https://ask.qcloudimg.com/http-save/yehe-1008345/zvnov1bt8l.jpeg?imageView2/2/w/1620)
+![image.png](https://upload-images.jianshu.io/upload_images/13064452-858290e7ea2e7085.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 
 三、平方损失函数
