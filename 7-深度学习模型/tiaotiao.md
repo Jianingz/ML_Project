@@ -1002,7 +1002,7 @@ feed_dict=feed)
  
 ... 100*np.sum(y_pred == y_test)/y_test.shape[0]))
 ```
-![image](https://img-blog.csdn.net/20180404152702228?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zODM2ODk0MQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+![image.png](https://upload-images.jianshu.io/upload_images/13064452-37af58d395326c96.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 ###     7.3.6 MLP的发展
 深度学习在语言、图像、自然语言处理方面展现出了超高的性能，受到了包括政府和产业界的广泛关注。接下来我将从语音、图像和自然语言处理三个方面展开叙述。
