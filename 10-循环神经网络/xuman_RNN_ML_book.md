@@ -1,48 +1,51 @@
-#目录
-1、常规循环神经网络简介
+# 第十章 循环神经网络
+#目录 
 
-	1.1 神经网络的简单入门
-	1.2 循环神经网络的提出背景
-	1.3 循环神经网络的数学原理
-		1.3.1 常规循环神经网络的逻辑图
-		1.3.2 常规神经网络的数学公式
-		1.3.3 损失函数（loss function）
-	1.4 循环神经网络的特点
-	1.5 循环神经网络的类别
-	1.6 常规循环神经网络存在的问题
-	1.7 反向传播算法进行梯度求解
-		1.7.1  反向传播算法（Backpropagation）
-		 1.7.2 随时间的反向传播过程（Back Propagation Through Time）
+10.1、常规循环神经网络简介
+
+	10.1.1 神经网络的简单入门
+	10.1.2 循环神经网络的提出背景
+	10.1.3 循环神经网络的数学原理
+		10.1.3.1 常规循环神经网络的逻辑图
+		10.1.3.2 常规神经网络的数学公式
+		10.1.3.3 损失函数（loss function）
+	10.1.4 循环神经网络的特点
+	10.1.5 循环神经网络的类别
+	10.1.6 常规循环神经网络存在的问题
+	10.1.7 反向传播算法进行梯度求解
+		10.1.7.1  反向传播算法（Backpropagation）
+		 10.1.7.2 随时间的反向传播过程（Back Propagation Through Time）
 		 
-2、循环神经网络的变体
+10.2、循环神经网络的变体
 
-	2.1 渗漏单元和门控机制
-		2.1.1 渗漏单元（leaky units）
-		2.1.2 门控机制
-	2.2 长短期记忆网络LSTM（Long-short term memory）
-		2.2.1 长短期记忆网络简介
-		2.2.2 长短期记忆网络详解
-	2.3 GRU
-		2.3.1 门控循环神经网络简介
-		2.3.2 门控循环神经网络详解
+	10.2.1 渗漏单元和门控机制
+		10.2.1.1 渗漏单元（leaky units）
+		10.2.1.2 门控机制
+	10.2.2 长短期记忆网络LSTM（Long-short term memory）
+		10.2.2.1 长短期记忆网络简介
+		10.2.2.2 长短期记忆网络详解
+	10.2.3 GRU
+		10.2.3.1 门控循环神经网络简介
+		10.2.3.2 门控循环神经网络详解
 		
-3、循环神经网络的应用
+10.3、循环神经网络的应用
 
-	3.1 keras简单介绍
-	3.2 用LSTM实现MNIST手写数字识别
-	3.3  LSTM实现简单的问答系统
-		3.3.1 问答系统简介
-		3.3.2 基于keras实现简单的问答系统
-	3.4  LSTM实现简单的文本生成
-		3.4.1文本生成原理
-		3.4.2 基于keras实现的简单古诗生成
+	10.3.1 keras简单介绍
+	10.3.2 用LSTM实现MNIST手写数字识别
+	10.3.3  LSTM实现简单的问答系统
+		10.3.3.1 问答系统简介
+		10.3.3.2 基于keras实现简单的问答系统
+	10.3.4  LSTM实现简单的文本生成
+		10.3.4.1文本生成原理
+		10.3.4.2 基于keras实现简单英文文本生成
+		10.3.4.3 基于keras实现简单中文文本生成
 		
-4、参考文献
+10.4、参考文献
 		
 
-# 1、常规循环神经网络简介
+# 10.1、常规循环神经网络简介
 
-##1.1 神经网络的简单理解
+##10.1.1 神经网络的简单理解
 
 * 深度学习中‘层’的概念  
 
@@ -59,7 +62,7 @@
 3. 应用模块——预测 | 分析
 
 
-## 1.2提出背景
+## 10.1.2提出背景
 **1. 处理序列信息**
 
 循环神经网络（Recurrent Neural Network）的提出主要是为了更好的利用序列信息（sequential Information）。在传统的神经网络中，一般假设所有的输入数据和所有的输出数据之间都是相互独立的，即前一个输入和后一个输入之间没有关联。传统神经网络忽略了数据之间的时序性，从输入层到隐藏层再到输出层，层与层之间是全连接的，而在同一层内的各节点之间是没有连接的，这种架构限制了传统神经网络的应用场景，如情感分析，文本预测等需要考虑前后数据关联性的任务，传统神经网络不能很好的解决此类问题。
@@ -89,8 +92,8 @@
 
 图1 RNN逻辑图
 
-## 1.3  数学原理
-###1.3.1 常规循环神经网络的逻辑图
+## 10.1.3  数学原理
+###10.1.3.1 常规循环神经网络的逻辑图
 
 RNN的数学本质与深度学习中传统网络的数学本质相同，都是通过权重矩阵与输入信息的线性变换加上激活函数的非线性变换，将输入空间映射到新的输出空间中去。
 
@@ -100,7 +103,7 @@ RNN的数学本质与深度学习中传统网络的数学本质相同，都是�
 ![RNN_6_from_zhihu](/Users/laiye/Desktop/ML/RNN/RNN_6.gif)
 ![RNN_6_from_zhihu](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_6.png)
 
-### 1.3.2 常规神经网络的数学公式：
+### 10.1.3.2 常规神经网络的数学公式：
 
 #### $$ 隐藏层： h_{t} = \sigma( W_{(hh)} h_{t-1} + W_{(xh)} x_{t} + b ) \qquad (1)$$
 #### $$ 输出层： \hat{y_{t}} = \sigma (W_{(ho)} h_{t})  \qquad (2) $$
@@ -126,13 +129,13 @@ RNN的数学本质与深度学习中传统网络的数学本质相同，都是�
 	- 可以拓展下sigmoid/tanh/relu的选择
 
 
-###1.3.3 损失函数（loss function）
+###10.1.3.3 损失函数（loss function）
 1. 交叉熵
 目前为止，所使用的循环神经网络的损失$L^{t}$都是用训练目标$y^{t}$和输出$o^{t}$之间的交叉熵（cross entropy）计算。
 ###$$ C\_entropy = - p(y^{t}) log (o^{t})$$
 可以看出交叉熵与似然函数表示的损失函数是一样的。
 
-## 1.4 循环神经网络的特点
+## 10.1.4 循环神经网络的特点
 
 **1. 参数共享性**
 
@@ -152,7 +155,7 @@ RNN的数学本质与深度学习中传统网络的数学本质相同，都是�
 
 常规的循环神经网络只存在对于过去信息的依赖性，为了利用未来信息与当前信息之间的关系，提出了双向循环神经网络（Bidirectional），具体讲解见第二部分——RNN的变体。
 
-##1.5 循环神经网络的类别
+##10.1.5 循环神经网络的类别
 
 循环神经网络主要应用于序列数据的处理，因输入与输出数据之间有时间上的关联性，所以在常规神经网络的基础上，加上了时间维度上的关联性，也就是有了循环神经网络。因此对于循环神经网络而言，它能够记录很长时间的历史信息，即使在某一时刻有相同的输入，但由于历史信息不同，也会得到不同的输出，这也是循环神经网络相比于常规网络的不同之处。
 根据输入与输出之间的对应关系，可以将循环神经网络分为以下五大类别：
@@ -170,7 +173,7 @@ RNN的数学本质与深度学习中传统网络的数学本质相同，都是�
 * 多对多（ many to many）：常用于输入输出序列长度不确定时，例如机器翻译（machine translate），实质是两个神经网络的叠加。
 *   不确定长度的多对多（many to many）（最右方）：常用于语音识别（speech recognition）中，输入与输出序列等长。
 
-## 1.6 常规循环神经网络存在的问题—长期依赖（Long Term dependencies）的问题
+## 10.1.6 常规循环神经网络存在的问题—长期依赖（Long Term dependencies）的问题
 
 ![RNN_6_from_zhihu](/Users/laiye/Desktop/ML/RNN/RNN_6.gif)
 
@@ -190,11 +193,11 @@ RNN最主要的特点在于能够根据上下文进行当前问题的预测。 �
 
 不管是梯度消失还是梯度爆炸，在循环神经网络的不断循环的过程中，都会造成隐藏层信息被丢弃的问题，使得隐藏层状态不能有效的向前传递到$h_{t}$。所以为了避免上述两种问题的发生，循环神经网络中的梯度相乘的积要尽可能的保持在1左右，才能够克服循环神经网络中长期依赖带来的梯度消失或者梯度爆炸问题。
 
-## 1.7 反向传播算法进行梯度求解—BP和BPTT
+## 10.1.7 反向传播算法进行梯度求解—BP和BPTT
 
 [BPTT](http://www.cnblogs.com/pinard/p/6509630.html)
 
-### 1.7.1  反向传播算法（Backpropagation）
+### 10.1.7.1  反向传播算法（Backpropagation）
 
 1、反向传播算法要解决的问题
 
@@ -288,7 +291,7 @@ $$\begin{split}
 
 求得了$ \delta^{l}$ 的递推关系之后，就可以依次求得各层的梯度$W^{l}和b^{l}$了。
 
-### 1.7.2 随时间的反向传播过程（Back Propagation Through Time）
+### 10.1.7.2 随时间的反向传播过程（Back Propagation Through Time）
 
 循环神经网络的特点是利用上下文做出对当前时刻的预测，RNN的循环也正是随时间进行的，采用梯度下降法对循环神经网络的损失函数进行迭代优化求其最小值时也是随时间进行的，所以这个也被称为随时间的反向传播（Back Propagation Through Time，BPTT），区别于深层神经网络中的反向传播（BP）。
 
@@ -385,7 +388,7 @@ $$\begin{split}
 &= \sum_{t=1}^{t=\tau}  \delta^{(t)} diag(1-h^{(t)} \bigodot h^{(t)})\\
 \end{split}$$
 
-## 1.8 循环神经网络与前馈神经网络的对比
+## 10.1.8 循环神经网络与前馈神经网络的对比
 
 前馈神经网络，也就是我们说的常规网络，只沿着网络向前传递，不存在循环过程，上一层的输出时下一层的输入。
 
@@ -405,17 +408,17 @@ $$\begin{split}
 Recurrent 的任意时刻的输入的本质还是单个向量，只不过是将不同时刻的向量按时间顺序输入网络，可以简单理解为矩阵。
 
 
-# 2、循环神经网络的变体
+# 10.2、循环神经网络的变体
 为了解决上述循环神经网络中存在的长期依赖问题，经过学者们的不断研究和试验，提出了很多循环神经网络的变体。
 
-## 2.1 渗漏单元和门控机制
+## 10.2.1 渗漏单元和门控机制
 
-### 2.1.1 渗漏单元（leaky units）
+### 10.2.1.1 渗漏单元（leaky units）
 
 为了使权重矩阵乘积保持在1左右，建立线性自连接单元(linear self-connections），并且这些连接的权重接近为1。线性自连接的隐藏单元称为渗漏单元（leaky unit）。线性自连接单元的权重设置一般有两种方式：（1）手动设定为常数，（2）设为自由变量，学习出来。   
 渗漏单元能够在较长时间内积累信息，且不存在梯度爆炸和梯度消失的问题。但是在很多情况下，这些积累的信息一经采用后，让神经网络遗忘掉旧的状态可能是更好的。比如在一个序列信息中又有很多子序列，神经网络计算完一个子序列之后，我们希望它能将状态自动初始为0并继续下一个子序列的计算。基于这种需求，人们提出了能够学习决定何时自动清除历史状态的门控循环神经网络（Gated Recurrent Neural Network）。
 
-### 2.1.2 门控机制
+### 10.2.1.2 门控机制
 
 门控RNN简单的说就是能够实现线性自连接单元权重的自动调节，神经网络能够学习何时遗忘旧的状态。
 
@@ -430,9 +433,9 @@ Recurrent 的任意时刻的输入的本质还是单个向量，只不过是将�
 
 目前比较主流的门控循环神经网络一种是长短期记忆（Long-short term memory），一般称为“LSTM”；另一种就是基于LSTM提出的门控循环单元（Gated recurrent unit），也称为“GRU”。
 
-## 2.2 长短期记忆网络LSTM（Long-short term memory）
+## 10.2.2 长短期记忆网络LSTM（Long-short term memory）
 
-###2.2.1 长短期记忆网络简介
+###10.2.2.1 长短期记忆网络简介
 长短期记忆（（Long short-term memory）最早是1997年由Hochreiter 和 Schmidhuber在论文《LONG SHORT-TERM MEMORY》$^{[3]}$中提出的。
 
 ![RNN_7_fom_colah](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_7.png)
@@ -448,7 +451,7 @@ LSTM最主要的就是记忆细胞（memory cell ），处于整个单元的水�
 ![RNN_9_fom_colah](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_9.png)
 ![RNN_9_from_colah](/Users/laiye/Desktop/ML/RNN/RNN_9.png)
 
-### 2.2.2 长短期记忆网络详解
+### 10.2.2.2 长短期记忆网络详解
 
 LSTM就是在每个小单元中增加了三个sigmoid函数，实现门控功能，控制数据的流入流出，分别称为遗忘门（forget gate），输入门（input gate）和输出门（output gate）。
 
@@ -514,9 +517,9 @@ $$\begin{split}
 $$ h_{t} = o_{t} \ast tanh(C_{t})   \qquad (11) $$
 
 
-## 2.3 门控循环神经网络（Gated Recurrent Neural Network）
+## 10.2.3 门控循环神经网络（Gated Recurrent Neural Network）
 
-###2.3.1 门控循环神经网络简介
+###10.2.3.1 门控循环神经网络简介
 
 在神经网络发展的过程中，几乎所有关于LSTM的文章中对于LSTM的结构都会做出一些变动，也称为LSTM的变体。其中变动较大的是门控循环单元（Gated Recurrent Units），也就是较为流行的GRU。GRU是2014年由Cho, et al在文章《Learning Phrase Representations using RNN Encoder–Decoder for Statistical Machine Translation》中提出的，某种程度上GRU也是对于LSTM结构复杂性的优化。LSTM能够解决循环神经网络因长期依赖带来的梯度消失和梯度爆炸问题，但是LSTM有三个不同的门，参数较多，训练起来比较困难。GRU只含有两个门控结构，且在超参数全部调优的情况下，二者性能相当，但是GRU结构更为简单，训练样本较少，易实现。
 
@@ -570,9 +573,9 @@ $$\begin{split}
 隐藏状态的输出信息由前一时刻的隐藏状态信息$h_{t-1}$和当前时刻的隐藏状态输出$h_{t}$，利用更新门控制这两个信息传递到未来的数据量。
 $$ h_{t} = z_{t} \ast h_{t-1} + (1 - z_{t} ) \ast \tilde {h_{t}}  \qquad (15) $$
 
-#3、循环神经网络的应用
+#10.3、循环神经网络的应用
 [keras中文文档](http://keras-cn.readthedocs.io/en/latest/for_beginners/concepts/)
-##3.1、keras简单介绍
+##10.3.1、keras简单介绍
 
 **1、张量**
 
@@ -762,7 +765,7 @@ use\_bias ：是否使用偏置。
 dropout：要丢失的数据比例。  
 recurrent_dropout：隐藏状态之间要丢失的数据比例     
 
-##3.2 用LSTM实现MNIST手写数字识别
+##10.3.2 用LSTM实现MNIST手写数字识别
 
 就像开始学习编程语言时入门程序是‘Hello World’一样，mnist就是机器学习中的‘Hello World’。
 
@@ -886,10 +889,12 @@ for i in range(num):
 ![RNN_18](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_18.png)
 ![RNN_18](/Users/laiye/Desktop/ML/RNN/RNN_18.png)
 
-# 3.3  LSTM实现简单的问答系统
-## 3.3.1 问答系统简介
+# 10.3.3  LSTM实现简单的问答系统
+## 10.3.3.1 问答系统简介
 
-##3.3.2 基于keras实现简单的问答系统
+本次示例为最为简单的问答系统，即通过语料集训练出模型，之后给模型一个问题，模型预测出问题的答案。
+
+##10.3.3.2 基于keras实现简单的问答系统
 
 模型逻辑图如下：  
 ![RNN_20](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_20.png)
@@ -1172,9 +1177,9 @@ for i in range(len(dialog_test)):
 总的来说就是，对话集数据进行embedding后的输出（矩阵），与问题集进行LSTM及RepeatVector后的输出（矩阵），两个矩阵（shape相同）相对应的拼接成一个大的矩阵，称为mat\_merge；mat\_merge进入LSTM训练，输出最后一个hidden\_state的输出，称为h\_out（一个列向量）。然后h\_out进入全连接层，此时h_out与词表中的每个词计算softmax的概率值，概率最大的即为预测的答案。
 
 
-## 3.4  LSTM实现简单的文本生成
+## 10.3.4  LSTM实现简单的文本生成
 
-### 3.4.1文本生成原理
+### 10.3.4.1文本生成原理
 
 本章节的文本生成（text  generation）示例基于char RNN，也就是说循环神经网络的输入为一个字一个字的序列，输出为与输入等长的字序列，属于上述中的等长的多对多的结构。
 
@@ -1188,16 +1193,148 @@ for i in range(len(dialog_test)):
 ![RNN_16](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_26.png)
 ![RNN_19](/Users/laiye/Desktop/ML/RNN/RNN_26.png)
 
-### 3.4.2 基于keras实现的简单古诗生成
+
+###10.3.4.2 基于keras实现简单英文文本生成
+
+本示例引用keras的官方示例，原始地址可在keras的GitHub上找到。在此，基于keras的代码，将结合循环神经网络进行进一步详细的注解，有助于刚入门神经网络或者自然语言处理的读者更好的理解神经网络和文本生成，完整代码将会在最后附上。
+
+（1）读取数据。本示例采用尼采的文章数据集，读取文件，并将所有英文字母转为小写字母。
+
+```python
+with io.open('nietzsche.txt', encoding='utf-8') as f:
+    #read character by character
+    text = f.read().lower()
+print('corpus length:', len(text))
+
+```
+
+(2)建立字典。得到每个字符对应的索引号，建立{字符：索引号}以及{索引号：字符}两个字典。
+
+```python
+chars = sorted(list(set(text)))
+print('total chars:', len(chars))
+char_indices = dict((c, i) for i, c in enumerate(chars))
+indices_char = dict((i, c) for i, c in enumerate(chars))
+```
+(3) 切分文本。被切分吼的每个文本段最长为maxlen，并记录每个文本段最大长度后的字符。因为此模型的功能实际上就是依据输入的前maxlen个字符，预测下一个字符。
+
+```python
+# cut the text in semi-redundant sequences of maxlen characters
+#在maxlen长的半冗余字符中分割文本
+maxlen = 40
+step = 3
+sentences = []
+next_chars = []
+for i in range(0, len(text) - maxlen, step):
+    sentences.append(text[i: i + maxlen])
+    next_chars.append(text[i + maxlen])
+print('nb sequences:', len(sentences))
+
+```
+(4)生成输入数据，并对输入数据进行向量化。
+
+```python
+print('Vectorization...')
+x = np.zeros((len(sentences), maxlen, len(chars)), dtype=np.bool)
+y = np.zeros((len(sentences), len(chars)), dtype=np.bool)
+for i, sentence in enumerate(sentences):
+    for t, char in enumerate(sentence):
+        x[i, t, char_indices[char]] = 1
+    y[i, char_indices[next_chars[i]]] = 1
+```
+
+（5）建立神经网络。此处采用最为简单的一层LSTM加一层全连接网络，最后加一个softmax的激活函数用于预测计算各个输出概率。采用交叉熵计算损失函数。
+
+```python
+# build the model: a single LSTM
+print('Build model...')
+model = Sequential()
+model.add(LSTM(128, input_shape=(maxlen, len(chars))))
+model.add(Dense(len(chars)))
+model.add(Activation('softmax'))
+
+optimizer = RMSprop(lr=0.01)
+model.compile(loss='categorical_crossentropy', optimizer=optimizer)
+
+```
+
+(6)概率抽样。不是完全选择概率最大的输出，而是根据生成的概率抽样选择最后的预测输出数据。temperature参数可以调节抽样的权重，当temperature较小时，选择概率较大的值输出，反之选择概率较小的。
+
+```python
+def sample(preds, temperature=1.0):
+    # helper function to sample an index from a probability array
+    preds = np.asarray(preds).astype('float64')
+    preds = np.log(preds) / temperature
+    exp_preds = np.exp(preds)
+    preds = exp_preds / np.sum(exp_preds)
+    probas = np.random.multinomial(1, preds, 1)
+    return np.argmax(probas)
+
+```
+(7)每个轮次的输出生成的文本，在训练的过程中可以更直观的看到模型随着训练次数的递增，生成的文本更符合语法规则，模型更加智能化。
+
+```python
+def on_epoch_end(epoch, logs):
+    # Function invoked at end of each epoch. Prints generated text.
+    print()
+    print('----- Generating text after Epoch: %d' % epoch)
+
+    start_index = random.randint(0, len(text) - maxlen - 1)
+    for diversity in [0.2, 0.5, 1.0, 1.2]:
+        print('----- diversity:', diversity)
+
+        generated = ''
+        sentence = text[start_index: start_index + maxlen]
+        generated += sentence
+        print('----- Generating with seed: "' + sentence + '"')
+        sys.stdout.write(generated)
+
+        for i in range(400):
+            x_pred = np.zeros((1, maxlen, len(chars)))
+            for t, char in enumerate(sentence):
+                x_pred[0, t, char_indices[char]] = 1.
+
+            preds = model.predict(x_pred, verbose=0)[0]
+            next_index = sample(preds, diversity)
+            next_char = indices_char[next_index]
+
+            generated += next_char
+            sentence = sentence[1:] + next_char
+
+            sys.stdout.write(next_char)
+            sys.stdout.flush()
+        print()
+
+print_callback = LambdaCallback(on_epoch_end=on_epoch_end)
+
+```
+(8)训练模型。
+
+```python
+model.fit(x, y,
+          batch_size=128,
+          epochs=20,
+          callbacks=[print_callback])
+```
+
+训练完60个轮次的结果如下：
+
+![RNN_29](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_29.png)
+![RNN_29](/Users/laiye/Desktop/ML/RNN/RNN_29.png)
+
+
+### 10.3.4.3 基于keras实现简单中文文本生成
 
 在本示例中，将会通过3000多首的唐诗，利用LSTM网络训练一个古诗生成的模型。
+
+代码引用自[https://github.com/youyuge34/Poems_generator_Keras](https://github.com/youyuge34/Poems_generator_Keras)
 
 **代码解读：**
 
 网络逻辑图如下：
 
-![RNN_19](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_19.png)
-![RNN_19](/Users/laiye/Desktop/ML/RNN/RNN_24.png)
+![RNN_24](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_24.png)
+![RNN_24](/Users/laiye/Desktop/ML/RNN/RNN_24.png)
 
 1、数据处理
 自然语言处理中，数据预处理的很多过程是共通的，都是要将文本数据进行编码，变为机器可以识别的词向量或者字向量，比如Word2Vec，one-hot编码等方法。
@@ -1205,6 +1342,7 @@ for i in range(len(dialog_test)):
 （1）读取古诗数据集，在每首诗的末尾加‘]’，并去除古诗名字只取古诗内容，最后得到一个长文本
 
 ```python
+#代码引用自[https://github.com/youyuge34/Poems_generator_Keras]
 with open('poetry.txt', 'r') as f:
     files_content = ''
     lines = [x  for x in f]
@@ -1259,7 +1397,7 @@ wordPairs = sorted(counted_words.items(), key=lambda x: -x[1])
 ```
 
 3、生成训练数据。
-（1）训练数据分为输入数据和输出数据，因为此处生成的是七言古诗，所以可得知输入6个字，预测输出一个字。
+（1）训练数据分为输入数据和输出数据，此处生成的是五言古诗。输入任意的6个字符（包含标点），预测输出一首古诗。。
 
 ```python
 #  max_len=6
@@ -1282,14 +1420,6 @@ for t, char in enumerate(x):
     x_vec[0, t] = self.word2numF(char)
     
 yield x_vec, y_vec
-```
-（3）此处用到一个while 1 的循环加生成器，每个batch生成一次输入输出向量，送入模型训练。
-
-```python
- i = 0
- while 1:
- ··· ···（上述代码）
- i += 1
 ```
 
 4、建立模型
@@ -1386,11 +1516,16 @@ for c in text:
 ![RNN_27](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_27.png)
 ![RNN_27](/Users/laiye/Desktop/ML/RNN/RNN_27.png)
 
-训练次数太少，模型还不能很好的生成古诗，可以看到随着训练次数的增加，模型会越加越智能。
+
+将模型的参数存储起来，之后可以直接调用模型，进行古诗的生成。示例如下：
+
+![RNN_28](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_28.png)
+![RNN_28](/Users/laiye/Desktop/ML/RNN/RNN_28.png)
+
+目前此模型可以生成五言古诗，并正确的匹配标点符号，但是语意方面还很不足，读者可以自己尝试增加训练集或者修改模型参数等方式自己尝试更优的方案。完整的示例代码可在github上下载。
 
 
-
-#参考文献
+#10.4.参考文献
 [1] 《Deep learning》 ····to do.   
 [2] 《知乎——超智能体》···to do.   
 [3]《LONG SHORT-TERM MEMORY》.   
