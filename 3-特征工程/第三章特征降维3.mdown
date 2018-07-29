@@ -1,0 +1,117 @@
+##  3.7 实战：PCA特征降维
+
+本次实战选取数据集sklearn中的fetch_lfw_people人脸图片。
++	导入数据集：
+
+```
+from sklearn.datasets import fetch_lfw_people
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+
+lfw_people = fetch_lfw_people(min_faces_per_person=20, resize=None)
+```
+
+min_faces_per_person:抽取的数据只保留人脸张树大于20的人脸图像
+首先获取数据集sklearn中的fetch_lfw_people人脸图片，这个操作需要比较长的时间，第一次下载以后，这个数据集将会被保存在你的电脑硬盘中。
+
+导入过程如下图所示：
+<img src="C:\Users\susanlt\Desktop\book\pic\3.jpg"></img>
+ 
+
++	导入数据集具体数据并将之用plot画图显示出来
+
+```
+# 获取数据集具体数据
+x = lfw_people.data
+y = lfw_people.target
+names = lfw_people.target_names
+
+n_samples, n_features = x.shape
+_, h, w = lfw_people.images.shape
+n_classes = len(names)
+
+print("样本数目: {}".format(n_samples))
+print("特征向量维度: {}".format(n_features))
+print("人脸分类数: {}".format(n_classes))
+# 图像像素大小即为特征向量维度值
+
+plot_Image(x, names[y], h, w,3,6)
+```
+
+其中，需要我们定义一个显示图片的函数如下：
+```
+# 定义一个画图显示功能
+def plot_Image(images, Imagetitles, h, w, row=3, col=6):
+    plt.figure(figsize=( 1.5*col,  2*row))   #将显示窗口稍微开大一些
+    plt.subplots_adjust(bottom=0.15, left=0.01, right=0.99, top=.85, hspace=0.35)
+    for i in range(row * col):
+        plt.subplot(row, col, i + 1)
+        plt.imshow(images[10+i].reshape((h, w)), cmap=plt.cm.gray)
+        plt.title(Imagetitles[i], size=12)
+        plt.xticks(())
+        plt.yticks(())
+plt.show()
+```
+
+
+结果如下：
+
+<img src="C:\Users\susanlt\Desktop\book\pic\4.jpg"></img>
+
+ 
+可以看到，我们导入的数据集中共有样本3023个，而每一个样本的特征维度为11750，这里需要注意，图片的特征维度其实也就是图像的像素值。最后，人脸分类数目为：62
+此时我们可以通过绘制图来将图片可视化显示出来：
+<img src="C:\Users\susanlt\Desktop\book\pic\5.jpg"></img>
+
+ 
++	对图片进行PCA降维：
+
+```
+n_components = 300
+print ("提取维度为%d 的特征脸，从 %d 张脸中" % (
+    n_components, x.shape[0]))
+
+pca = PCA(n_components=n_components)   #做PCA特征降维
+pca.fit(x.copy())
+eigenfaces = pca.components_.reshape((n_components, h, w))
+
+eigenface_Imagetitles = [" %d" % i for i in range(eigenfaces.shape[0])]
+plot_Image(eigenfaces, eigenface_Imagetitles, h, w)
+```
+
+降维后得到维度为300的特征脸，将其特征脸显示出来：
+<img src="C:\Users\susanlt\Desktop\book\pic\6.jpg"></img>
+
+ 
++	根据PCA降维后得到的特征脸进行人脸重构：
+在我们PCA降维之后，得到了特征维度降低的特征脸，但是此时我们需要保证，原始的图片数据信息需要大部分能够重构出来，即，我们需要保证重构后得到的图片能够尽可能与原始图片相似。
+
+```
+#定义重构函数
+def reconstruct_Images(trans,features):
+    Rep = trans.transform(features)
+    reconstruct_image = trans.inverse_transform(Rep)
+    return Rep, reconstruct_image
+    
+idx_to_reconstruct = 4    
+x_idx = x[idx_to_reconstruct]
+low_dimensional_representation, reconstructed_image = reconstruct_Images(pca,x_idx.reshape(1, -1))
+plt.subplot(1,2,1)
+plt.imshow(x_idx.reshape((h, w)), cmap=plt.cm.gray)
+plt.title("original image")
+plt.subplot(1,2,2)
+plt.imshow(reconstructed_image.reshape((h, w)), cmap=plt.cm.gray)
+#将重构后的图片显示出来
+plt.title("Reconstructed from Full PCA")  
+plt.show()
+```
+ 
+
+<img src="C:\Users\susanlt\Desktop\book\pic\7.jpg"></img>
+ 
+由此可见，经过特征降维后的图片保留了大量的特征信息，并能够对原图片进行重构，实现了我们最初的要求。
+
+
+
+
+
