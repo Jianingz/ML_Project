@@ -108,6 +108,7 @@ with tf.Session() as sess:
 				print (input_value, sess.run(y, 
 				feed_dict={inputs_placeholder: [input_value]}))
 ```
+
 ## 7.3.3 激活函数（sigmoid,Relu等)
 
 加拿大蒙特利尔大学的Bengio教授在 ICML 2016的文章中给出了激活函数的定义：激活函数是映射 h:R→R，且几乎处处可导。激活函数的主要作用是提供网络的非线性建模能力。这句话是没有激活函数的神经网络本质上只能简单的线性运算，那么为了改善神经网络性能加入隐藏层的操作，将没有任何意义。故引入激活函数，神经网络才能处理非线性的问题。所以激活函数一般都是非线性的。
@@ -260,9 +261,11 @@ Hinge损失函数的表达式如下图，从表达式可以看出，当数据点
 ![image](https://upload-images.jianshu.io/upload_images/4155986-a5fdf3873dfb2bb3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/558)
 
 ## 如何训练（反向传播）
+
 神经网络是一个模型，它包含两类参数，一类是需要让模型自己学习它的参数：神经网络中的权重和偏置。另一类称为超参数，不需要学习：一个神经网络的连接方式、网络的层数、每层的节点数这些参数。
 
 在正式开始介绍BP算法前，先来介绍一下BP算法的由来。1969年,人工神经网络创始人明斯基(Marrin M insky)和佩珀特(Seymour Papert)合作出版了《感知器》一书,论证了简单的线性感知器功能有限,例如不能解决如“异或”(XOR )这样的基本问题,而且对多层网络也持悲观态度。这些论让学界对神经网络研究陷入低谷期。虽然在1974年哈佛大学的Paul Werbos发明BP算法，但是当时神经网络的研究处于低潮期，并未受到改有的重视。终于在1983年，加州理工学院的物理学家John Hopfield利用神经网络，在旅行商这个NP完全问题的求解上获得当时最好成绩，引起了轰动，但是Hopfield仍然没能打消人们对多层网络的顾虑。直到David Rumelhart等学者出版的《平行分布处理:认知的微观结构探索》一书。书中完整地提出了BP算法,系统地解决了多层网络中隐单元连接权的学习问题,并在数学上给出了完整的推导。BP算法才得以出现在人们的视线中，用于解决多层神经网络中参数优化的问题。
+
 BP算法具有实现映射能力、记忆机制和容错性的三种特性。实现映射能力是指，记忆机制是指具有足够多隐单元的三层神经同络可以记忆任给的样本集。同时孙德保、高超对三层BP同络的容错性和抗干扰性进行了研究，指出三层BP网络的容错能力取决于输入层到隐含层的连接权值矩阵与隐含层到辖出层连接权值矩阵的乘积的结果。
 
 接下来，我们介绍反向传播算法的主要思想：
@@ -282,9 +285,13 @@ BP算法具有实现映射能力、记忆机制和容错性的三种特性。实
 ![image](https://upload-images.jianshu.io/upload_images/1241397-6a97cc9d982c4fcb.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/700)
 
 以给定数据集![image](https://upload-images.jianshu.io/upload_images/13064452-93a43d724bc5ad77.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)为例，接下来进行参数的说明：
+
 d：表示输入层神经元个数
+
 l：输出层神经元的个数
+
 q: 隐藏层神经元的个数
+
 ![image](https://upload-images.jianshu.io/upload_images/13064452-377fc678f23c301b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)：输出层第j个神经元的阈值
 
 ![image](https://upload-images.jianshu.io/upload_images/13064452-9662b094a1424da6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)：隐藏层第h个神经元的阈值
@@ -302,8 +309,11 @@ q: 隐藏层神经元的个数
 接着我们需要明确损失函数，我们以均方误差函数为例：
 
 对于给定的样本![image.png](https://upload-images.jianshu.io/upload_images/13064452-4fb3f15938fb6c80.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)假设神经网络的输出为![image.png](https://upload-images.jianshu.io/upload_images/13064452-4fb3f15938fb6c80.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)，则此时样本的均方误差为：![image](https://upload-images.jianshu.io/upload_images/13064452-6c03fb830e103a2f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
 接下来我们使用梯度下降的方式调整参数，调整参数的公式如下：
+
 ![image](https://upload-images.jianshu.io/upload_images/13064452-f6e2c3070e3e764c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
 在开始优化参数前，我们需要计算神经网络各层的梯度，首先是输出层
 
 使用链式法则求导输出层阈值关于损失函数的梯度，公式如下：
@@ -326,6 +336,7 @@ q: 隐藏层神经元的个数
 ![image.png](https://upload-images.jianshu.io/upload_images/13064452-8d4c7500d0190e38.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 接下来是隐藏层阈值关于损失函数的梯度，仍然可以由链式法则推导得到
+
 ![image.png](https://upload-images.jianshu.io/upload_images/13064452-155fcd3091197101.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 ![image.png](https://upload-images.jianshu.io/upload_images/13064452-d896060f47b4f169.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
@@ -333,8 +344,11 @@ q: 隐藏层神经元的个数
 观察上述表达式可以得出隐藏层梯度取决于隐藏层的输出、输出层阈值的梯度和隐藏层与输出层的权重。这也揭示了神经网络的精髓：在阈值调整过程中，当前层的参数的梯度取决于后一层参数的梯度。
 接下来我将举一些简单的数字来推导一下整个过程：
 假设现在有这样一个网络层：第一层是输入层，包含两个输入i1、i2和一个偏置b1，第二层是隐藏层，包含两个神经元，分别是h1，h2和偏置b2，第三层是输出层，两个神经元分别是o1和o2。
+
 ![image.png](https://upload-images.jianshu.io/upload_images/13064452-33e3ccf0142ebb7f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
 接下来我们随机给这个简单的网络设置初值
+
 ![image.png](https://upload-images.jianshu.io/upload_images/13064452-642ceca7f4920015.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 其中，输入数据  i1=0.05，i2=0.10;
 
@@ -361,7 +375,9 @@ w5=0.40,w6=0.45,w7=0.50,w8=0.55
 从隐藏层到输出层：
 同样以sigmoid函数作为激活函数，可以得到o1和o2的值：
 ![image.png](https://upload-images.jianshu.io/upload_images/13064452-c9b5612b056c82f2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
 ![image.png](https://upload-images.jianshu.io/upload_images/13064452-34cdff0946a9f4ec.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
 查看结果，我们发现神经网络的输出与我们预期的值存在差异，接下来我们定义损失函数，使用BP算法来优化参数。
 
 这里我们使用平方误差来作为损失函数进行计算。
@@ -371,9 +387,13 @@ w5=0.40,w6=0.45,w7=0.50,w8=0.55
 因为有两个输出，所以分别计算o1和o2的误差，总误差为两者之和：
 
 ![image](http://upload-images.jianshu.io/upload_images/13064452-bca6bbb778b1cf98.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240) 
+
 同理可以得到：
+
 ![image](http://upload-images.jianshu.io/upload_images/13064452-c015326c38de6bb7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
 二者相加得到总共的损失如下：
+
 ![image](http://upload-images.jianshu.io/upload_images/13064452-8e982a5b02230e37.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 2.隐含层到输出层的权值更新：
@@ -507,9 +527,10 @@ w5=0.40,w6=0.45,w7=0.50,w8=0.55
 
 ![image](http://upload-images.jianshu.io/upload_images/13064452-b4743a76bf8a116c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-　　这样误差反向传播法就完成了，最后我们再把更新的权值重新计算，不停地迭代，在这个例子中第一次迭代之后，误差由0.298371109下降至0.291027924。迭代多次后误差会有显著的减少。
+这样误差反向传播法就完成了，最后我们再把更新的权值重新计算，不停地迭代，在这个例子中第一次迭代之后，误差由0.298371109下降至0.291027924。迭代多次后误差会有显著的减少。
 
 ## python代码实例（API调用和手写代码实现）
+
 首先我们先手动搭建一个MLP网络，代码如下：
 ```
 ##读取图片并将图片中的像素点数据标准化
@@ -1009,6 +1030,7 @@ feed_dict=feed)
 ![image.png](https://upload-images.jianshu.io/upload_images/13064452-37af58d395326c96.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 ###     7.3.6 MLP的发展
+
 深度学习在语言、图像、自然语言处理方面展现出了超高的性能，受到了包括政府和产业界的广泛关注。接下来我将从语音、图像和自然语言处理三个方面展开叙述。
 
 一、深度学习在语音识别领域的应用
