@@ -1,5 +1,5 @@
 # 第十章 循环神经网络
-#目录 
+# 目录 
 
 10.1、常规循环神经网络简介
 
@@ -45,7 +45,7 @@
 
 # 10.1、常规循环神经网络简介
 
-##10.1.1 神经网络的简单理解
+## 10.1.1 神经网络的简单理解
 
 * 深度学习中‘层’的概念  
 
@@ -93,14 +93,14 @@
 图1 RNN逻辑图
 
 ## 10.1.3  数学原理
-###10.1.3.1 常规循环神经网络的逻辑图
+### 10.1.3.1 常规循环神经网络的逻辑图
 
 RNN的数学本质与深度学习中传统网络的数学本质相同，都是通过权重矩阵与输入信息的线性变换加上激活函数的非线性变换，将输入空间映射到新的输出空间中去。
 
-![RNN_2_from_cs224d](/Users/laiye/Desktop/ML/RNN/RNN_2.png)
+
 ![RNN_2_from_cs224d](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_2.png)
 
-![RNN_6_from_zhihu](/Users/laiye/Desktop/ML/RNN/RNN_6.gif)
+
 ![RNN_6_from_zhihu](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_6.png)
 
 ### 10.1.3.2 常规神经网络的数学公式：
@@ -129,7 +129,7 @@ RNN的数学本质与深度学习中传统网络的数学本质相同，都是�
 	- 可以拓展下sigmoid/tanh/relu的选择
 
 
-###10.1.3.3 损失函数（loss function）
+### 10.1.3.3 损失函数（loss function）
 1. 交叉熵
 目前为止，所使用的循环神经网络的损失$L^{t}$都是用训练目标$y^{t}$和输出$o^{t}$之间的交叉熵（cross entropy）计算。
 ###$$ C\_entropy = - p(y^{t}) log (o^{t})$$
@@ -155,14 +155,14 @@ RNN的数学本质与深度学习中传统网络的数学本质相同，都是�
 
 常规的循环神经网络只存在对于过去信息的依赖性，为了利用未来信息与当前信息之间的关系，提出了双向循环神经网络（Bidirectional），具体讲解见第二部分——RNN的变体。
 
-##10.1.5 循环神经网络的类别
+## 10.1.5 循环神经网络的类别
 
 循环神经网络主要应用于序列数据的处理，因输入与输出数据之间有时间上的关联性，所以在常规神经网络的基础上，加上了时间维度上的关联性，也就是有了循环神经网络。因此对于循环神经网络而言，它能够记录很长时间的历史信息，即使在某一时刻有相同的输入，但由于历史信息不同，也会得到不同的输出，这也是循环神经网络相比于常规网络的不同之处。
 根据输入与输出之间的对应关系，可以将循环神经网络分为以下五大类别：
 
 
-![RNN_15](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_25.png)
-![RNN_19](/Users/laiye/Desktop/ML/RNN/RNN_25.png)
+![RNN_25](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_25.png)
+
 
 
 常规网络中的输入与输出大多是向量与向量之间的关联，不考虑时间上的联系，而在循环神经网络中，输入与输出之间大多是序列与序列(Sequence-to-Sequence.)之间的联系，也就产生了多种模式。
@@ -175,7 +175,7 @@ RNN的数学本质与深度学习中传统网络的数学本质相同，都是�
 
 ## 10.1.6 常规循环神经网络存在的问题—长期依赖（Long Term dependencies）的问题
 
-![RNN_6_from_zhihu](/Users/laiye/Desktop/ML/RNN/RNN_6.gif)
+![RNN_6_from_zhihu](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_6.png)
 
 $^{[2]}$忽略激活函数的非线性变换，只看上图蓝色箭头的传输。由公式（1）简化可以得出  $$ h_{t} = W_{(hh)} h_{t-1} \qquad (3)$$ 
 如果从隐藏层的初识状态$h_{0}$开始计算，可以得到：$$ h_{t} = W_{(hh)}^{t}h_{0} \qquad (4)$$
@@ -296,7 +296,7 @@ $$\begin{split}
 循环神经网络的特点是利用上下文做出对当前时刻的预测，RNN的循环也正是随时间进行的，采用梯度下降法对循环神经网络的损失函数进行迭代优化求其最小值时也是随时间进行的，所以这个也被称为随时间的反向传播（Back Propagation Through Time，BPTT），区别于深层神经网络中的反向传播（BP）。
 
 ![RNN_15_from_zhihu](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_15.png)
-![RNN_5_from_zhihu](/Users/laiye/Desktop/ML/RNN/RNN_15.png)
+
 
 * 为了更易被读者理解推导过程，如上图所示，我们进行以下定义：  
 *  U：输入层的权重矩阵  
@@ -439,17 +439,17 @@ Recurrent 的任意时刻的输入的本质还是单个向量，只不过是将�
 长短期记忆（（Long short-term memory）最早是1997年由Hochreiter 和 Schmidhuber在论文《LONG SHORT-TERM MEMORY》$^{[3]}$中提出的。
 
 ![RNN_7_fom_colah](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_7.png)
-![RNN_7_from_colah](/Users/laiye/Desktop/ML/RNN/RNN_7.png)
+
 
 在所有的循环神经网络中都有一个如图所示的循环链，链式结构的每个单元将输入的信息进行处理后输出。在常规循环神经网络中的链式结构的单元中只含有一个非线性函数对数据进行非线性转换，比如tanh函数。而在LSTM等RNN变体的循环神经网络中，每个单元在不同位置多加了几个不同的非线性函数，实现不同的功能，解决不同的问题。如下图所示。
 
 ![RNN_8_fom_colah](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_8.png)
-![RNN_8_from_colah](/Users/laiye/Desktop/ML/RNN/RNN_8.png)
+
 
 LSTM最主要的就是记忆细胞（memory cell ），处于整个单元的水平线上，起到了信息传送带的作用，只几个含有简单的线性操作，能够保证数据流动时保持不变，也就相当于上文说的渗漏单元。如下图所示。
 
 ![RNN_9_fom_colah](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_9.png)
-![RNN_9_from_colah](/Users/laiye/Desktop/ML/RNN/RNN_9.png)
+
 
 ### 10.2.2.2 长短期记忆网络详解
 
@@ -459,7 +459,7 @@ LSTM就是在每个小单元中增加了三个sigmoid函数，实现门控功能
 
 
 ![RNN_10_fom_colah](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_10.png)
-![RNN_10_from_colah](/Users/laiye/Desktop/ML/RNN/RNN_10.png)
+
 
 **主要功能：** 决定记忆细胞中要丢弃的信息，也就是决定前一时刻记忆细胞$C_{t-1}$中有多少信息能够继续传递给当前时刻的记忆细胞$C_{t}$。  
 **数学公式：** 
@@ -471,7 +471,7 @@ f_{t} &=\sigma (W_{f} \cdot [h_{t-1}, x_{t}] + b_{f}) \\
 2、输入门（input gate）
 
 ![RNN_11_fom_colah](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_11.png)
-![RNN_11_from_colah](/Users/laiye/Desktop/ML/RNN/RNN_11.png)
+
 
 **主要功能：** 决定有多少新的输入信息能够进入当前时刻的记忆细胞$C_{t}$。  
 **数学公式：** 
@@ -483,7 +483,7 @@ i_{t} &=\sigma (W_{i} \cdot [h_{t-1}, x_{t}] + b_{i}) \\
 3、输出门（output gate）
 
 ![RNN_12_fom_colah](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_12.png)
-![RNN_12_from_colah](/Users/laiye/Desktop/ML/RNN/RNN_12.png)
+
 
 **主要功能：** 决定有多少当前时刻的记忆细胞$C_{t}$中的信息能够进入到隐藏层状态$h_{t}$中。  
 **数学公式：** 
@@ -501,7 +501,7 @@ $$ \begin{split}
 \end{split}  \qquad (9)$$
 
 ![RNN_13_fom_colah](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_13.png)
-![RNN_13_from_colah](/Users/laiye/Desktop/ML/RNN/RNN_13.png)
+
 
 遗忘门的输出与旧状态相乘，决定有多少旧状态的信息能够进入到新的记忆细胞；输入门的输出与候选记忆细胞相乘，决定有多少信息要被更新。二者线性相加得到当前时刻被更新过的记忆细胞。
 $$\begin{split}
@@ -519,7 +519,7 @@ $$ h_{t} = o_{t} \ast tanh(C_{t})   \qquad (11) $$
 
 ## 10.2.3 门控循环神经网络（Gated Recurrent Neural Network）
 
-###10.2.3.1 门控循环神经网络简介
+### 10.2.3.1 门控循环神经网络简介
 
 在神经网络发展的过程中，几乎所有关于LSTM的文章中对于LSTM的结构都会做出一些变动，也称为LSTM的变体。其中变动较大的是门控循环单元（Gated Recurrent Units），也就是较为流行的GRU。GRU是2014年由Cho, et al在文章《Learning Phrase Representations using RNN Encoder–Decoder for Statistical Machine Translation》中提出的，某种程度上GRU也是对于LSTM结构复杂性的优化。LSTM能够解决循环神经网络因长期依赖带来的梯度消失和梯度爆炸问题，但是LSTM有三个不同的门，参数较多，训练起来比较困难。GRU只含有两个门控结构，且在超参数全部调优的情况下，二者性能相当，但是GRU结构更为简单，训练样本较少，易实现。
 
@@ -530,9 +530,9 @@ GRU在LSTM的基础上主要做出了两点改变 ：
 （2）取消进行线性自更新的记忆单元（memory cell），而是直接在隐藏单元中利用门控直接进行线性自更新。GRU的逻辑图如上图所示。
 
  ![RNN_14_fom_colah](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_14.png)
-![RNN_14_from_colah](/Users/laiye/Desktop/ML/RNN/RNN_14.png)
 
-### 2.3.2 门控循环神经网络详解
+
+### 10.2.3.2 门控循环神经网络详解
 
 1、更新门（update gate）
 
@@ -870,7 +870,7 @@ print('acc:',score[1])
 ```
 
 ![RNN_17](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_17.png)
-![RNN_17](/Users/laiye/Desktop/ML/RNN/RNN_17.png)
+
 
 ```python
 import matplotlib.pyplot as plt
@@ -887,18 +887,18 @@ for i in range(num):
     plt.axis = 'off'
 ```
 ![RNN_18](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_18.png)
-![RNN_18](/Users/laiye/Desktop/ML/RNN/RNN_18.png)
+
 
 # 10.3.3  LSTM实现简单的问答系统
 ## 10.3.3.1 问答系统简介
 
 本次示例为最为简单的问答系统，即通过语料集训练出模型，之后给模型一个问题，模型预测出问题的答案。
 
-##10.3.3.2 基于keras实现简单的问答系统
+## 10.3.3.2 基于keras实现简单的问答系统
 
 模型逻辑图如下：  
 ![RNN_20](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_20.png)
-![RNN_20](/Users/laiye/Desktop/ML/RNN/RNN_20.png)
+
 
 数据集：Facebook的bAbI数据  
 训练集：  
@@ -1065,7 +1065,7 @@ dialog_test, ques_test, ans_test = vectorize_dialog(test, wd_idx, dialog_maxlen,
 * 对话集的网络搭建。
 
 ![RNN_22](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_22.png)
-![RNN_22](/Users/laiye/Desktop/ML/RNN/RNN_22.png)  
+ 
 
 注：dialog\_maxlen = 149，embedding\_out = 50.   
 输入：（dialog\_maxlen，）  即（None，149).     
@@ -1087,7 +1087,7 @@ encodeed_dialog = Dropout(0.3)(encodeed_dialog)
 
 LSTM的输出进行RepeatVector，也就是重复dialog_maxlen次，这样encodeed_ques的shape就变为了（dialog_maxlen，lstm_out）。与encodeed_dialog的shape相同，这样才能进行merge层的add。
 ![RNN_21](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_21.png)
-![RNN_21](/Users/laiye/Desktop/ML/RNN/RNN_21.png)
+
 
 ```python 
 #问题集 embedding + dropout + lstm
@@ -1101,7 +1101,7 @@ encodeed_ques = RepeatVector(dialog_maxlen)(encodeed_ques)
 * 对话集和问题集之间是存在内在联系的，将二者通过merge层之后再进行循环神经网络的训练。
 
 ![RNN_23](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_23.png)
-![RNN_23](/Users/laiye/Desktop/ML/RNN/RNN_23.png)
+
 
 ```python
 # merge 对话集和问题集的模型 merge后进行 lstm + dropout + dense
@@ -1172,7 +1172,7 @@ for i in range(len(dialog_test)):
 预测输出示例：
 
 ![RNN_19](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_19.png)
-![RNN_19](/Users/laiye/Desktop/ML/RNN/RNN_19.png)
+
 
 总的来说就是，对话集数据进行embedding后的输出（矩阵），与问题集进行LSTM及RepeatVector后的输出（矩阵），两个矩阵（shape相同）相对应的拼接成一个大的矩阵，称为mat\_merge；mat\_merge进入LSTM训练，输出最后一个hidden\_state的输出，称为h\_out（一个列向量）。然后h\_out进入全连接层，此时h_out与词表中的每个词计算softmax的概率值，概率最大的即为预测的答案。
 
@@ -1191,10 +1191,10 @@ for i in range(len(dialog_test)):
 再经过不断的迭代和优化训练出文本生成的模型。
 
 ![RNN_16](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_26.png)
-![RNN_19](/Users/laiye/Desktop/ML/RNN/RNN_26.png)
 
 
-###10.3.4.2 基于keras实现简单英文文本生成
+
+### 10.3.4.2 基于keras实现简单英文文本生成
 
 本示例引用keras的官方示例，原始地址可在keras的GitHub上找到。在此，基于keras的代码，将结合循环神经网络进行进一步详细的注解，有助于刚入门神经网络或者自然语言处理的读者更好的理解神经网络和文本生成，完整代码将会在最后附上。
 
@@ -1320,7 +1320,7 @@ model.fit(x, y,
 训练完60个轮次的结果如下：
 
 ![RNN_29](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_29.png)
-![RNN_29](/Users/laiye/Desktop/ML/RNN/RNN_29.png)
+
 
 
 ### 10.3.4.3 基于keras实现简单中文文本生成
@@ -1334,7 +1334,7 @@ model.fit(x, y,
 网络逻辑图如下：
 
 ![RNN_24](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_24.png)
-![RNN_24](/Users/laiye/Desktop/ML/RNN/RNN_24.png)
+
 
 1、数据处理
 自然语言处理中，数据预处理的很多过程是共通的，都是要将文本数据进行编码，变为机器可以识别的词向量或者字向量，比如Word2Vec，one-hot编码等方法。
@@ -1514,13 +1514,13 @@ for c in text:
     res += seed
 ```
 ![RNN_27](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_27.png)
-![RNN_27](/Users/laiye/Desktop/ML/RNN/RNN_27.png)
+
 
 
 将模型的参数存储起来，之后可以直接调用模型，进行古诗的生成。示例如下：
 
 ![RNN_28](https://github.com/xuman-Amy/ML_project_images/blob/master/RNN/RNN_28.png)
-![RNN_28](/Users/laiye/Desktop/ML/RNN/RNN_28.png)
+
 
 目前此模型可以生成五言古诗，并正确的匹配标点符号，但是语意方面还很不足，读者可以自己尝试增加训练集或者修改模型参数等方式自己尝试更优的方案。完整的示例代码可在github上下载。
 
