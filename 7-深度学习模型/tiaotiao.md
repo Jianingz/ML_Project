@@ -227,6 +227,7 @@ Hinge损失函数的表达式如下图，从表达式可以看出，当数据点
 ![image](https://upload-images.jianshu.io/upload_images/4155986-dfb3e453e1976caf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/494)
 
 当样本个数为n时，此时的损失函数变为
+
 ![image](https://upload-images.jianshu.io/upload_images/4155986-c25862df8df6f742.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/528)
 
 在实际应用中通常使用均方差作为损失函数，其表达式如下：
