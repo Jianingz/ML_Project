@@ -43,6 +43,7 @@ MLP--任海霞部分
 参数：随机初始化，范围为(-1, 1)
 代码实现可以参考：
 ```
+# encoding: utf-8
 #!/usr/bin/env python
 import tensorflow as tf
 import math
